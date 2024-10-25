@@ -57,6 +57,11 @@ services:
       WORDPRESS_DB_USER: ${WP_USER} 
       WORDPRESS_DB_PASSWORD: ${WP_USER_PASS} 
       WORDPRESS_DB_NAME: ${WP_DATABASE}
+    deploy:
+      resources:
+        limits:
+          memory: 100m
+          cpus: "2"
 
   db:
     image: mysql
@@ -69,6 +74,11 @@ services:
       MYSQL_USER: ${WP_USER} 
       MYSQL_PASSWORD: ${WP_USER_PASS} 
       MYSQL_DATABASE: ${WP_DATABASE}
+    deploy:
+      resources:
+        limits:
+          memory: 200m
+          cpus: "2"
 
   adminer: 
     image: adminer 
