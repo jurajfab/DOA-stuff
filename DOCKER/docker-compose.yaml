@@ -1,0 +1,85 @@
+### Example with named variables 
+services:
+  wp:
+    image: wordpress
+    ports:
+      - 80:80
+    networks:
+      - wordpress
+    volumes:
+      - wp_data:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: wp
+      WORDPRESS_DB_USER: wp_user  
+      WORDPRESS_DB_PASSWORD: secret456 
+      WORDPRESS_DB_NAME: wordpress
+
+  db:
+    image: mysql
+    networks:
+      - wordpress
+    volumes:
+      - wp_db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: strongSecret789
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: secret456 
+      MYSQL_DATABASE: wordpress
+
+  adminer: 
+    image: adminer 
+    ports: 
+      - 8080:8080
+    networks:
+      - wordpress
+
+volumes:
+  wp_db: {}
+  wp_data: {}  
+
+networks:
+  wordpress: {} 
+
+##################################################
+
+### Example with variables taken from .env file 
+services:
+  wp:
+    image: wordpress
+    ports:
+      - 80:80
+    networks:
+      - wordpress
+    volumes:
+      - wp_data:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: ${WP_HOST} 
+      WORDPRESS_DB_USER: ${WP_USER} 
+      WORDPRESS_DB_PASSWORD: ${WP_USER_PASS} 
+      WORDPRESS_DB_NAME: ${WP_DATABASE}
+
+  db:
+    image: mysql
+    networks:
+      - wordpress
+    volumes:
+      - wp_db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+      MYSQL_USER: ${WP_USER} 
+      MYSQL_PASSWORD: ${WP_USER_PASS} 
+      MYSQL_DATABASE: ${WP_DATABASE}
+
+  adminer: 
+    image: adminer 
+    ports: 
+      - 8080:8080
+    networks:
+      - wordpress
+
+volumes:
+  wp_db: {}
+  wp_data: {}  
+
+networks:
+  wordpress: {} 
