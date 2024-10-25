@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Release.Name }}-{{.Chart.Name }}-{{ .Values.part }}
+  name: {{ .Release.Name }}-{{.Chart.Name }}-{{ .Values.part }}
+spec:
+  ports:
+  - name: www
+    port: {{ .Values.service.port }}
+    protocol: TCP
+    targetPort: {{ .Values.service.targetPort }}
+  selector:
+    app: {{ .Release.Name }}-{{.Chart.Name }}-{{ .Values.part }}
+  type: {{ .Values.service.type | default "LoadBalancer" }}

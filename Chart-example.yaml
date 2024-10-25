@@ -1,0 +1,7 @@
+apiVersion: v2
+name: rambo
+description: RAMBO - First Blood Chart
+type: application
+version: 1.0.0
+appVersion: "2024.1.0"
+icon: https://img.freepik.com/premium-vector/rambo-icon-icon-colored-outline_1076610-3239.jpg

@@ -1,0 +1,37 @@
+## RAMBO ## 
+part: 1
+service: 
+  port: 8000
+  targetPort: 8000
+  type: ClusterIP
+
+---------------
+## WORDPRESS ## 
+persistence:
+  enabled: true
+  size: "100Mi"
+
+wordpressUsername: jano
+wordpressPassword: kolobezka
+
+service:
+  type: ClusterIP
+  ports:
+    http: 8000
+  targetPort:
+    http: 80
+
+mariadb:
+  auth:
+    rootPassword: secret
+
+  primary:
+    persistence:
+      enabled: true
+      size: "200Mi"
+
+ingress:
+  enabled: true
+  hostname: www.wordpress-training.sk
+  path: /
+  pathType: Prefix

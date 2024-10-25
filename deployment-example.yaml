@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Release.Name }}-{{.Chart.Name }}-{{ .Values.part }}
+  name: {{ .Release.Name }}-{{.Chart.Name }}-{{ .Values.part }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-{{.Chart.Name }}-{{ .Values.part }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-{{.Chart.Name }}-{{ .Values.part }}
+    spec:
+      containers:
+      - image: bletvaska/rambo:{{ .Values.part }}
+        name: {{ .Release.Name }}-{{.Chart.Name }}-{{ .Values.part }}
