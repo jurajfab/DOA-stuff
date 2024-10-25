@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: wp_data
+spec:
+ #storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
+  capacity:            # how much
+    storage: 500Mi
+  accessModes:         # additional params
+    - ReadWriteOnce
+  hostPath:            # volume type params
+    path: "/mnt/wp_data"
+    type: DirectoryOrCreate
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: wp_db
+spec:
+ #storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
+  capacity:            # how much
+    storage: 500Mi
+  accessModes:         # additional params
+    - ReadWriteOnce
+  hostPath:            # volume type params
+    path: "/mnt/wp_db"
+    type: DirectoryOrCreate
