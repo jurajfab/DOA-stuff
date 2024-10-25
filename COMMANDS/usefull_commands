@@ -1,5 +1,5 @@
 
-ieval "$(ssh-agent -s)"          # start ssh agent
+eval "$(ssh-agent -s)"          # start ssh agent
 ssh-add <path to private key>   # add priavte key to ssh agent that I want to use 
 
 # Generating SSH key 
