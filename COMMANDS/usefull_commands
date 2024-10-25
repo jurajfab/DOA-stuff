@@ -18,3 +18,6 @@ Configuration file for ssh
         IdentityFile ~/.ssh/github_rsa
 
 watch -n 1 --differences docker container ls --all          # kazdu sekundu sleduje zmeny vo vypise docker container ls
+
+AKO ZAHASHOVAT text: echo -n "text" | base64
+AKO ODHASHOVAT text: echo -n "text" | base64 -d 
