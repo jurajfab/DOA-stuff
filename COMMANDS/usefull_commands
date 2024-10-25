@@ -1,0 +1,20 @@
+
+ieval "$(ssh-agent -s)"          # start ssh agent
+ssh-add <path to private key>   # add priavte key to ssh agent that I want to use 
+
+# Generating SSH key 
+ssh-keygen -t rsa -b 4096 -C "comment/email"        # generates ssh key 
+ssh-keygen -o                                       # generates ed key 
+ssh-copy-id -i ~/.ssh/id_rsa ubuntu@3.121.22.38     # copy ssh public to remote host 
+
+Configuration file for ssh 
+    # Personal gitHUB key
+    IdentityFile ~/.ssh/github_rsa
+
+    Host github.com
+        HostName github.com
+        User git
+        PreferredAuthentications publickey
+        IdentityFile ~/.ssh/github_rsa
+
+watch -n 1 --differences docker container ls --all          # kazdu sekundu sleduje zmeny vo vypise docker container ls

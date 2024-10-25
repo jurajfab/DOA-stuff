@@ -11,7 +11,7 @@ helm repo add bitnami https://charts.bitnami.com/bitnami        # prida reposita
 helm repo update                # aktualizuje repo, lokalne je k dispozicii 
 helm repo remove <repo_name>    # zmaze repository 
 
-helm show chart bitanmi/nginx      # zobrazi meta data balicka 
+helm show chart bitanmi/nginx       # zobrazi meta data balicka 
 helm show readme bitnami/nginx      # zobrazi readme file balicka
 helm show values bitnami/nginx      # zobrazi defualtnu konfiguraciu balicka 
 helm show crds bitnami/nginx        # zobrazi vlastne k8s zdroje (custom resource definition objects)
