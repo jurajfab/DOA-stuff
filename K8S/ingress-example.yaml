@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rambo-controller
+  # namespace: application
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: rambo-1-svc
+            port:
+              number: 8000
+        path: /rambo/1
+        pathType: Prefix # Prefix
+      - backend:
+          service:
+            name: rambo-2-svc
+            port:
+              number: 8000
+        path: /rambo/2
+        pathType: Prefix # Prefix
+      - backend:
+          service:
+            name: rambo-3-svc
+            port:
+              number: 8000
+        path: /rambo/3
+        pathType: Prefix # Prefix
+      - backend:
+          service:
+            name: rambo-4-svc
+            port:
+              number: 8000
+        path: /rambo/4
+        pathType: Prefix # Prefix
+      - backend:
+          service:
+            name: rambo-5-svc
+            port:
+              number: 8000
+        path: /rambo/5
+        pathType: Prefix # Prefix

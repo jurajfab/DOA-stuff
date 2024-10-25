@@ -1,0 +1,232 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-wp
+data:
+  WORDPRESS_DB_USER: wpuser
+  WORDPRESS_DB_NAME: wordpress
+  WORDPRESS_DB_HOST: wp-db
+
+---
+
+apiVersion: v1
+data:
+  WORDPRESS_DB_PASSWORD: ZW5kMzIx
+kind: Secret
+metadata:
+  name: secrets-wp
+
+---
+
+apiVersion: v1
+data:
+  MARIADB_PASSWORD: ZW5kMzIx
+  MARIADB_ROOT_PASSWORD: dG9wLnNlY3JldA==
+kind: Secret
+metadata:
+  name: secrets-db
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-db
+data:
+  MARIADB_USER: wpuser
+  MARIADB_DATABASE: wordpress
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wp-db-pvc
+spec:
+  storageClassName: "" # musim to tu zadat ak chcem pouzit pv ktore som vytvoril
+  resources:
+    requests:
+      storage: 350Mi
+  accessModes:
+  - ReadWriteOnce
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: wp-db
+    tier: backend
+    env: prod
+    customer: tuke
+  name: wp-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wp-db
+  template:
+    metadata:
+      labels:
+        app: wp-db
+        tier: backend
+        env: prod
+        customer: tuke
+    spec:
+      containers:
+      - image: mariadb
+        name: mariadb
+        volumeMounts:
+        - name: db-pvc
+          mountPath: /var/lib/mysql
+        envFrom:
+        - configMapRef:
+            name: config-db
+        - secretRef:
+            name: secrets-db
+      volumes:
+      - name: db-pvc
+        persistentVolumeClaim:
+          claimName: wp-db-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: wp-db
+    tier: backend
+    env: prod
+    customer: tuke
+  name: wp-db
+spec:
+  ports:
+  - port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: wp-db
+  type: ClusterIP
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wp-data
+spec:
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 460Mi
+  accessModes:
+  - ReadWriteOnce
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: wp
+    tier: frontend
+    env: prod
+    customer: tuke
+  name: wp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wp
+  template:
+    metadata:
+      labels:
+        app: wp
+        tier: frontend
+        env: prod
+        customer: tuke
+    spec:
+      containers:
+      - image: wordpress
+        name: wordpress
+        envFrom:
+        - configMapRef:
+            name: config-wp
+        - secretRef:
+            name: secrets-wp
+        volumeMounts:
+        - name: data
+          mountPath: /var/www/html
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: wp-data
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: wp
+    tier: frontend
+    env: prod
+    customer: tuke
+  name: wp-app
+spec:
+  ports:
+  - port: 8000
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: wp
+  type: LoadBalancer
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: wp-adminer
+    tier: frontend
+    env: dev
+  name: wp-adminer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wp-adminer
+  template:
+    metadata:
+      labels:
+        app: wp-adminer
+        tier: frontend
+        env: dev
+    spec:
+      containers:
+      - image: adminer
+        name: adminer
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: wp-adminer
+    tier: frontend
+    env: dev
+  name: wp-adminer
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+    nodePort: 31500
+  selector:
+    app: wp-adminer
+  type: NodePort

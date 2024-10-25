@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: 300m
+spec:
+  capacity:
+    storage: 300Mi
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: "/mnt/300m"
+    type: DirectoryOrCreate
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: 400m
+spec:
+  capacity:
+    storage: 400Mi
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: "/mnt/400m"
+    type: DirectoryOrCreate
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: 500m
+spec:
+  capacity:
+    storage: 500Mi
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: "/mnt/500m"
+    type: DirectoryOrCreate
