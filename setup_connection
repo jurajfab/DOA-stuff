@@ -1,0 +1,62 @@
+•	DON'T USE COMPUTER EQUIPPED WITH NUCLEUS!!!
+•	if running Nucleus, then with admin rights, add the route to the destination machine:
+
+$ route add AWS_HOST_IP mask 255.255.255.255 HOME_ROUTER_GW_IP
+
+Note: You will need to add it again and again after rebooting your computer. The HOME_ROUTER_GW_IP is not the IP address of your VPN provider, but the IP address of your Home Router.
+•	if using Windows computer, install cmder or Git Bash. For installation you can use Chocolatey (package manager for windows). Then you can simply type from CLI:
+
+$ choco install cmder
+
+•	for "light" development, install Visual Studio Code locally
+o	install extension Remote Development
+
+### Create SSH keys ### 
+1.	Run command line of cmder
+2.	In the CLI type:
+
+$ ssh-keygen
+
+3.	For every question just press Enter. The keys will be installed in to your home directory (in Windows it is C:\Users\user\) into directory .ssh\
+
+Your public SSH key and your name paste into this document. When I add your SSH key to your AWS machine, your SSH key will be marked green, so you can try your connection then.
+Only Windows Users: Setting Up ssh for VS Code
+ssh.exe, which is part of Windows installation, is not working with VS Code. So we need to provide a path to the ssh.exe provided with Git Bash/Cmder. To do that, follow the following instructions:
+1.	Go to menu File > Preferences > Settings
+2.	Search for: Remote.SSH: Path
+3.	Enter absolute path for ssh.exe, which in case of Cmder should looks like:
+C:\tools\cmder\vendor\git-for-windows\usr\bin\ssh.exe
+or in case of Gitbash should looks like:
+C:\Program Files\Git\usr\bin\ssh.exe
+
+
+### Setting Up SSH Connection in VS Code ###
+When your SSH key is already on AWS machine and you know it's IP address, you can setup your SSH connection on VS Code:
+
+1.	in the side toolbar click on an icon Remote Explorer and from the list choose entry SSH Targets
+2.	From the Remote Explorer combo select Remotes (Tunnels/SSH)
+3.	click the wheel/config button (Open SSH Config File)
+4.	select the user's config file (first option from list)
+/home/your-user/.ssh/config
+5.	Paste into configuration file following lines:
+
+Host docker.training
+   	HostName 18.184.142.224
+    	User ubuntu
+    	# Windows users will write:
+   	 IdentityFile "C:\Users\jano\.ssh\id_rsa"
+    	# Linux users will write:
+    	IdentityFile "~/.ssh/id_rsa"
+Finally - don't forget to reload Remote Configuration in VS Code by clicking the reload button on top of the Remote Explorer toolbar, as you can see on following picture:
+
+### Connecting to AWS machine with VS Code ### 
+1.	in the side toolbar click on an icon Remote Explorer and from the list choose entry SSH Targets
+2.	From the Remote Explorer combo select Remotes (Tunnels/SSH)
+3.	Select the created connection named as docker.training and click to the right arrow to start connection
+4.	during the connection confirm following:
+o	type of remote system (Linux)
+o	fingerprint
+When you successfully connect, in lower left corner you will see connection info in the form SSH: AWS.IP.ADDRESS
+For a full experience, click on the Explorer icon in the toolbar, then click on the Open button. VS Code itself will offer you the path leading to the user's home folder, which we also use (/home/ubuntu/). Next, you will see a list of files and folders in the user's home folder.
+
+$ ssh ubuntu:Docker101@docker.training
