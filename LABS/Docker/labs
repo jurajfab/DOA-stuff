@@ -1,0 +1,122 @@
+--- Lab: Weather s API kľúčom --- 
+Spustite aplikáciu (kontajner) z obrazu bletvaska/weather, ktorá
+- sa bude volať weather,
+- vypublikuj port 8000 na ktorom je aplikacia dostupna, 
+- bude získavať informácie o meste Bratislava každých 30 sekúnd, a
+- aby bolo možné tieto informácie zo služby openweathermap.org získať, je
+potrebné použiť token 9e547051a2a00f2bf3e17a160063002d.
+Ak budete postupovať správne, po spustení uvidíte aktuálne počasie v Bratislave.
+
+SOLUTION:
+docker container run --rm -it \
+--name weather \
+--publish 8000:8000 \
+--env WEATHER_QUERY="Bratislava" \ 
+--env WEATHER_UPDATE_INTERVAL=30 \ 
+--env WEATHER_TOKEN="9e547051a2a00f2bf3e17a160063002d" \
+bletvaska/weather
+
+##################################
+
+--- Lab: Pocasie pre Kosice a Bratislavu
+Spustite aplikáciu z obrazu bletvaska/weather tak, aby ste mali na porte 8000 k dispozícii
+počasie pre Košice a na porte 9000 ste mali k dispozícii počasie pre Bratislavu.
+Kontajner s počasím z Košíc pomenujte weather-ke a kontajner s počasím z Bratislavy
+pomenujte weather-ba. Zoznam potrebných premenných prostredia nájdete na stránke
+obrazu bletvaska/weather.
+
+SOLUTION: 
+docker container run --detach \
+--name weather-ke \ 
+--env WEATHER_QUERY="Kosice" \
+--env WEATHER_UPDATE_INTERVAL=30 \
+--env WEATHER_TOKEN="9e547051a2a00f2bf3e17a160063002d" \
+--publish 8000:8000 \
+bletvaska/weather
+
+docker container run --detach \
+--name weather-ba \ 
+--env WEATHER_QUERY="Bratislava" \
+--env WEATHER_UPDATE_INTERVAL=30 \
+--env WEATHER_TOKEN="9e547051a2a00f2bf3e17a160063002d" \
+--publish 9000:8000 \
+bletvaska/weather
+
+#####################################
+
+--- Lab: Running MinIO with Custom Credentials --- 
+Spustite úložisko MinIO, ktoré je kompatibilné so službou S3 od Amazon-u. Pri spúšťaní
+musí platiť:
+kontajner pre úložisko MinIO vytvorte z obrazu bitnami/minio a pomenujte ho
+minio
+● do hostiteľského počítača publikujte porty z kontajnera 9000 a 9001
+● do premennej MINIO_ENV vložte hodnotu development
+● nastavte prihlasovacie údaje pre používateľa admin s heslom secret123 pomocou
+premenných prostredia MINIO_ROOT_USER a MINIO_ROOT_PASSWORD
+● pomocou premennej TZ nastavte časovú zónu na Europe/Bratislava
+● pomocou premennej MINIO_DEFAULT_BUCKETS zabezpečte, aby sa rovno po
+spustení vytvorili tieto buckety:
+○ pictures
+○ videos
+○ music
+○ documents
+Po úspešnom spustení môžete otvoriť prehliadač na adrese http://$HOSTIP:9001, kde 
+máte k dispozícii admin rozhranie. Prihláste sa pomocou zadaného prihlasovacieho loginu a
+hesla. Do vytvorených bucket-ov môžete nahrať niekoľko ľubovoľných súborov.
+Riešiť úlohu môžete pomocou samostatných volieb pri spúšťaní kontajnera alebo vytvorením .env súboru.
+
+SOLUTION: 
+docker container run --rm -it \
+-- name minio \
+-- publish 9000:9000 \
+-- publish 9001:9001 \ 
+-- env-file variables.env \
+bitnami/minio 
+
+variable.env
+MINIO_ENV=development
+MINIO_ROOT_USER=admin
+MINIO_ROOT_PASSWORD=secret123
+TZ=Europe/Bratislava
+MINIO_DEFAULT_BUCKETS=pictures,videos,music,documents 
+
+###########################################
+
+--- Lab: MySQL with ADMINER ---
+Spustite databázový server, ku ktorému budete pristupovať pomocou jednoduchého
+rozhrania Adminer. O vašom riešení musí platiť:
+● kontajner pre admin rozhranie vytvorte z obrazu adminer a pomenujte ho ako ui
+● kontajner pre databázu vytvorte z obrazu mysql so značkou 8.0 a pomenujte ho
+ako db
+● heslo pre používateľa root v databázovom serveri nechajte vygenerovať náhodne
+● do hosťovského počítača tunelujte len port 8080 z kontajnera adminer a namapujte
+ho na port 80
+● pri inicializácii nech je vytvorená aj databáza batcave pre používateľa batman s
+heslom catwoman
+Ak ste postupovali správne, po otvorení prehliadača na adrese http://$HOSTIP sa
+zobrazí rozhranie Adminer-a. Ak sa prihlásite s účtom používateľa root na databázový
+server, dostanete sa do jeho admin.
+Poznámka: Pre pripojenie sa na databázový server z admin rozhrania použite jeho IP
+adresu. Tú zistíte napríklad príkazom container inspect.
+
+SOLUTION: 
+docker container run --detach --rm \
+--name ui \
+--publish 80:8080 \
+adminer 
+
+docker container run --rm -it \
+--name db \
+--env-file db.env \
+mysql:9.0
+
+db.env
+MYSQL_RANDOM_ROOT_PASSWORD=yes
+MYSQL_USER=batman
+MYSQL_PASSWORD=catwoman
+MYSQL_DATABASE=batcave
+
+- heslo pre roota sa zobrazi v logu 
+- ip addresu najdes docker: container inspect db | jq .[].NetworkSettings.IPAddress
+
+###############################################
