@@ -1,0 +1,36 @@
+--- Lab: Deploy Rambo --- 
+Nasaďte aplikáciu z obrazu bletvaska/rambo. O tomto nasadení bude platiť:
+
+bude sa volať rambo
+bude postavená na obraze bletvaska/rambo:1
+bude spustená v piatich replikách
+
+SOLUTION: 
+kubectl create deployment rambo --image bletvaska/rambo:1 --replicas 5
+
+#########################################
+
+--- Lab: Make Rambo Online --- 
+Z nasadenia rambo vytvorte nasledujúce služby:
+
+Vytvorte službu typu ClusterIP, o ktorej bude platiť, že bude v klastri dostupná na porte 8080. Služba sa bude volať rambo-cl.
+
+Vytvorte z tohto nasadenia službu typu NodePort, o ktorej bude rovnako platiť, že v klastri bude dostupná na porte 8080. Služba sa bude volať rambo-np.
+
+Vytvorte z tohto nasadenia službu typu LoadBalancer, ktorá bude zvonku dostupná na porte 8080. Služba sa bude volať rambo-lb.
+
+Poznámka: Aplikácia je v kontajneri spustená na porte 8000.
+
+Overte spustenie služby buď pomocou prehliadača, alebo klientov z príkazového riadku curl a http, alebo pomocou podpríkazu port-forward. Po overení po sebe všetko zmažte ;)
+
+SOLUTION: 
+kubectl create deployment rambo --image bletvaska/rambo:1 
+
+kubectl expose deployment rambo 
+k expose deployment rambo --name rambo-cl --type ClusterIP --port 8080 --target-port 8000
+k port-forward --address 0.0.0.0 deployments/rambo 8080:8000
+k expose deployment rambo --name rambo-np --type NodePort --port 8080 --target-port 8000
+k expose deployment rambo --name rambo-lb --type LoadBalancer --port 8080 --targetPort 8000
+
+##############################################
+
