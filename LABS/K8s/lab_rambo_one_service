@@ -118,5 +118,13 @@ spec:
 
 ##############################################
 
+--- Lab: Selektívne aktualizácie --- 
+Na základe infraštruktúry, ktorú ste vyrobili v predchádzajúcom labáku, aktualizujte jednotlivé nasadenia takto:
+v Košiciach pustite Rambo 2
+v Prešove pustit Rambo 3
+v Bratislave pustit Rambo 4
 
----
+SOLUTION: 
+kubectl set image deployments rambo-po rambo=bletvaska/rambo:3
+kubectl set image deployments rambo-ke rambo=bletvaska/rambo:2
+kubectl set image deployments rambo-ba rambo=bletvaska/rambo:4

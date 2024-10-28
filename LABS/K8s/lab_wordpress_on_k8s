@@ -215,3 +215,240 @@ spec:
     env: dev
     tier: frontend
   type: NodePort
+
+--- Lab: Wordpress with ConfigMap and Secrets ---
+Uprav manifest tak ze variables schovas do configmapy a secrets 
+
+SOLUTION: 
+db_credentials.env
+MARIADB_DATABASE=wordpress
+MARIADB_USER=wpuser
+kubectl create configmap db-config --from-env-file db_credentials.env --output yaml --dry-run=client
+
+db_secrets.yaml
+MARIADB_PASSWORD=end321
+MARIADB_ROOT_PASSWORD=top.secret
+kubectl create secret generic db-secrets --from-env-file db_secrets.yaml --output yaml --dry-run=client
+
+wp_credentials.env 
+WORDPRESS_DB_NAME=wordpress
+WORDPRESS_DB_USER=wpuser
+WORDPRESS_DB_HOST=wp-db
+kubectl create configmap wp-config --from-env-file wp_credentials.env --output yaml --dry-run=client
+
+kubectl create secret generic wp-secrets --from-literal=WORDPRESS_DB_PASSWORD=end321 --dry-run=client --output yaml
+
+manifest.yaml  
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wordpress
+
+--- 
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-config
+data:
+  MARIADB_DATABASE: wordpress
+  MARIADB_USER: wpuser
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secrets
+data:
+  MARIADB_PASSWORD: ZW5kMzIx
+  MARIADB_ROOT_PASSWORD: dG9wLnNlY3JldA==
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wp-config
+data:
+  WORDPRESS_DB_HOST: wp-db
+  WORDPRESS_DB_NAME: wordpress
+  WORDPRESS_DB_USER: wpuser
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wp-secrets
+data:
+  WORDPRESS_DB_PASSWORD: ZW5kMzIx
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: wp-db
+    tier: backend
+    env: prod
+    customer: tuke 
+  name: wp-db
+  namespace: wordpress 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wp-db
+      tier: backend
+      env: prod
+      customer: tuke
+  template:
+    metadata:
+      labels:
+        app: wp-db
+        tier: backend
+        env: prod
+        customer: tuke
+    spec:
+      containers:
+      - image: mariadb
+        name: mariadb
+        envFrom:
+        - configMapRef:
+            name: db-config
+        - secretRef:
+            name: db-secrets
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: wp-db
+    tier: backend
+    env: prod
+    customer: tuke
+  name: wp-db
+  namespace: wordpress
+spec:
+  ports:
+  - name: db
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: wp-db
+  type: ClusterIP
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: wp-app
+    tier: frontend
+    env: prod
+    customer: tuke 
+  name: wp-app
+  namespace: wordpress
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: wp-app
+      tier: frontend
+      env: prod
+      customer: tuke
+  template:
+    metadata:
+      labels:
+        app: wp-app
+        tier: frontend
+        env: prod
+        customer: tuke
+    spec:
+      containers:
+      - image: wordpress
+        name: wordpress
+        envFrom:
+        - configMapRef:
+            name: wp-config
+        - secretRef:
+            name: wp-secrets
+
+---          
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: wp-app
+    tier: frontend
+    env: prod
+    customer: tuke
+  name: wp-app
+  namespace: wordpress
+spec:
+  ports:
+  - name: www
+    port: 8000
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: wp-app
+  type: LoadBalancer
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: adminer
+    tier: frontend
+    env: dev 
+  name: adminer
+  namespace: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      tier: frontend
+      env: dev 
+  template:
+    metadata:
+      labels:
+        tier: frontend
+        env: dev 
+    spec:
+      containers:
+      - image: adminer
+        name: adminer
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: adminer
+    env: dev
+    tier: frontend
+  name: wp-adminer
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+    nodePort: 31200
+  selector:
+    env: dev
+    tier: frontend
+  type: NodePort
+
+
+
