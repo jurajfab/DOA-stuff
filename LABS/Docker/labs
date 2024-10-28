@@ -264,3 +264,42 @@ WP_HOST=db
 $ docker compose up 
 
 ################################################
+
+--- Lab: Toolbox as Alias --- 
+Vytvorte alias s názvom toolbox, ktorý spustí kontajner z obrazu bletvaska/toolbox.
+Toolbox je obraz nabitý rozličnými nástrojmi, ktoré ocení nejeden devops inžinier. Alias
+toolbox vám uľahčí jeho používanie vo vašej každodennej práci. Zabezpečte, aby:
+● sa po spustení a hlavne po ukončení kontajner odstránil
+● bol do priečinku kontajnera /home/work pripojený lokálny priečinok, v ktorom sa
+práve nachádzate
+● UID používateľa a GID používateľa v kontajneri zodpovedali uvedeným údajom
+lokálneho používateľa
+Použitie alias-u bude následne vyzerať takto:
+$ toolbox vim hello.md
+
+SOLUTION: 
+alias toolbox="docker container run --rm -it bletvaska/toolbox"
+toolbox vim <file>
+
+#####################################################
+
+--- Lab: Matrix Dockerfile creation --- 
+SOLUTION: 
+Dockerfile 
+FROM alpine:3.20
+
+LABEL maintainer="mirek <mirek@cnl.sk>"
+LABEL homepage="https://bletvaska.github.io"
+LABEL description="Terminal based replica of the digital rain from The Matrix."
+
+RUN apk add tmatrix
+
+ENV MATRIX_TITLE="Docker Rocks!"
+
+CMD [ "/bin/sh", "-c", "tmatrix --title=\"$MATRIX_TITLE\"" ]
+
+docker image build --tag matrix:1.0 .
+docker container run --rm -it matrix:1.0 
+
+######################################################
+
