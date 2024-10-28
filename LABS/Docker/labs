@@ -120,3 +120,147 @@ MYSQL_DATABASE=batcave
 - ip addresu najdes docker: container inspect db | jq .[].NetworkSettings.IPAddress
 
 ###############################################
+--- Lab: My Homepage --- 
+Pomocou obrazu nginx vytvorte svoju domovskú stránku, ktorá sa spustí ako predvolená stránka webového servera nginx. 
+Po spustení tohto obrazu sa stránka zobrazí v prehliadači.
+
+Pri realizovaní úlohy dodržte tieto pokyny:
+- základ vášho obrazu bude postavený na nginx
+- kontajner pomenujte homepage a publikujte port 80
+- ako domovskú stránku si stiahnite niektorú z voľne dostupných šablón napr. pre Bootstrap (pekným príkladom je freelancer)
+- podpíšte sa do stránky (napr. prepíšte najväčší názov)
+- do päty stránky zapíšte verziu a autora stránky z premenných kontajnera
+svoju domovskú stránku nahrajte do priečinku /usr/share/nginx/html pomocou príkazu container cp
+
+Výsledok svojej práce si viete overiť otvorením prehliadača na adrese http://$HOSTIP, 
+prípadne zobrazením obsahu priečinku /usr/share/nginx/html, v ktorom sa musia nachádzať všetky súbory a priečinky zo stiahnutej šablóny.
+
+SOLUTION:
+wget https://github.com/startbootstrap/startbootstrap-freelancer/archive/gh-pages.zip
+unzip gh-pages.zip
+upravis index.html 
+
+docker container run --rm --detach \
+--name homepage \
+--publish 80:80 \
+nginx
+
+docker container cp freelancer/. homepage:/usr/share/nginx/html
+
+#####################################################
+--- Lab: Persistent Homepage (pomenovany zvazok) --- 
+Zabezpec trvacnost dat mojej domovskej stranky pomocou pomenovanych zvazkov
+
+SOLUTION: 
+docker container run --rm --detach \
+--name homepage \
+--publish 80:80 \
+--volume www:/usr/share/nginx/html \
+nginx
+
+docker container run --rm --detach \
+--name homepage \
+--publish 80:80 \
+nginx
+
+#####################################################
+--- Lab: Persistent Homepage (bind mount) ---
+Domovsku stranku tentoraz nechajte ulozenu v hostitelskom operacnom systeme v priecinku www. 
+Tento priecinok nasledne pripojte ku kontajneru s obrazom nginx:alpine tak, aby ho tent opouzil ako domovsku stranku. 
+
+SOLUTION: 
+docker container run --rm --detach \
+--name homepage \
+--publish 80:80 \
+--volume $(pwd)/www:/usr/share/nginx/html \
+nginx
+
+####################################################
+--- Lab: User/File prava --- 
+Spusti container s lokalnymi pravami uzivatela
+
+SOLUTION:
+docker container run --rm \
+--volume .:/data \
+--user $(id --user):$(id --group)\
+alpine
+
+######################################################
+
+--- Lab: Wordpress App --- 
+Vytvorte kompoziciu troch kontajnerov, ktore budu poskytovat vo vysledku perzistentnú aplikaciu CMS Wordpress. 
+Pre vase riesenie musi platit:
+
+kontajner aplikacie Wordpress spustite z obrazu wordpress a pomenujte ho wp
+ako databazu použite kontajner z obrazu mysql a pomenujte ho db
+pre admin rozhranie databázy spustite kontajner Adminer z obrazu adminer a pomenujte ho adminer
+Wordpress bude k dispozícii lokalne na porte 80
+Adminer bude k dispozícii lokalne na porte 8080
+všetky kontajnery spustite v sieti wordpress
+všetky zväzky, ktoré vytvoríte pre zabezpečenie perzistencie, označte prefixom wp_
+pre konfiguraciu pripojenia Wordpress-u k databaze pouzite premenne prostredia, aby tato cast zbehla automaticky 
+konfiguracia databazy bude nasledovná:
+
+root heslo: secret
+meno databázy pre Wordpress: wordpress
+meno pouzivatela Wordpress databázy: wp_user
+heslo pre používateľa Wordpress databázy: wp_password 
+
+Ak ste postupovali spravne, po prístupe prehliadacom na adresu http://$HOSTIP uvidíte rozhranie aplikacie Wordpress, 
+kde len dokončíte process instalacie a nastavite veci ako jazyk, nazov stranky, prveho pouzivatela a pod. 
+A keď otvoríte prehliadač na adrese http://$HOSTIP:8080 uvidíte webové rozhranie aplikacie Adminer, 
+s ktorým sa viete prihlásiť do databázy bud ako pouzivatel root s heslom secret alebo ako pouzivatel wp_user s heslom wp_password.
+
+SOLUTION: 
+docker-compose.yaml
+services:
+  wp:
+    image: wordpress
+    ports:
+      - 80:80
+    networks:
+      - wordpress
+    volumes:
+      - wp_data:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: ${WP_HOST} 
+      WORDPRESS_DB_USER: ${WP_USER} 
+      WORDPRESS_DB_PASSWORD: ${WP_USER_PASS} 
+      WORDPRESS_DB_NAME: ${WP_DATABASE}
+
+  db:
+    image: mysql
+    networks:
+      - wordpress
+    volumes:
+      - wp_db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+      MYSQL_USER: ${WP_USER} 
+      MYSQL_PASSWORD: ${WP_USER_PASS} 
+      MYSQL_DATABASE: ${WP_DATABASE}
+
+  adminer: 
+    image: adminer 
+    ports: 
+      - 8080:8080
+    networks:
+      - wordpress
+
+volumes:
+  wp_db: {}
+  wp_data: {}  
+
+networks:
+  wordpress: {}
+------
+.env 
+DB_ROOT_PASS=secret
+WP_USER=wp_user
+WP_USER_PASS=wp_password
+WP_DATABASE=wordpress
+WP_HOST=db
+-------
+$ docker compose up 
+
+################################################
