@@ -1,0 +1,92 @@
+--- Lab: Running MinIO with ConfigMap --- 
+Vytvorte manifest pre spustenie aplikácie MinIO. O tomto manifeste platí:
+● riešenie vytvorte v mennom priestore minio
+● ako obraz aplikácie použite bitnami/minio
+● vypublikujte porty 9000 a 9001 služby
+● zabezpečte, aby aplikácia bola nasadená v jednej inštancii
+● zoznam bucket-ov, ktorý je potrebné vytvoriť, je pictures,videos,music,docs
+● admin používateľ sa bude volať janosik a jeho heslo bude valaska123
+Pre správu premenných prostredia použite konfiguračné mapy.
+
+SOLUTION: 
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: minio
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minio-settings
+  namespace: minio
+data:
+  MINIO_ROOT_PASSWORD: valaska123
+  MINIO_ROOT_USER: janosik
+  MINIO_DEFAULT_BUCKETS: pictures,videos,music,docs 
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: minio
+  name: minio
+  namespace: minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - image: bitnami/minio
+        name: minio
+        envFrom:
+        - configMapRef:
+            name: minio-settings
+
+--- 
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: minio
+  name: minio
+spec:
+  ports:
+  - port: 9000
+    protocol: TCP
+    targetPort: 9000
+  selector:
+    app: minio
+  type: LoadBalancer
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: minio
+  name: minio
+spec:
+  ports:
+  - name: api 
+    port: 9000
+    protocol: TCP
+    targetPort: 9000
+  - name: console  
+    port: 9001
+    protocol: TCP
+    targetPort: 9001
+  selector:
+    app: minio
+  type: LoadBalancer
