@@ -12,15 +12,11 @@ kubectl create deployment rambo --image bletvaska/rambo:1 --replicas 5
 
 --- Lab: Make Rambo Online --- 
 Z nasadenia rambo vytvorte nasledujúce služby:
-
 Vytvorte službu typu ClusterIP, o ktorej bude platiť, že bude v klastri dostupná na porte 8080. Služba sa bude volať rambo-cl.
-
 Vytvorte z tohto nasadenia službu typu NodePort, o ktorej bude rovnako platiť, že v klastri bude dostupná na porte 8080. Služba sa bude volať rambo-np.
-
 Vytvorte z tohto nasadenia službu typu LoadBalancer, ktorá bude zvonku dostupná na porte 8080. Služba sa bude volať rambo-lb.
 
 Poznámka: Aplikácia je v kontajneri spustená na porte 8000.
-
 Overte spustenie služby buď pomocou prehliadača, alebo klientov z príkazového riadku curl a http, alebo pomocou podpríkazu port-forward. Po overení po sebe všetko zmažte ;)
 
 SOLUTION: 
@@ -33,4 +29,67 @@ k expose deployment rambo --name rambo-np --type NodePort --port 8080 --target-p
 k expose deployment rambo --name rambo-lb --type LoadBalancer --port 8080 --targetPort 8000
 
 ##############################################
+
+--- Lab: Get nginx hello online --- 
+Vytvorte službu s názvom nginx-hello, ktorá:
+● bude postavená na obraze nginxdemos/hello
+● bude spustená v piatich replikách
+● v klastri bude dostupná na porte 8080
+● typ služby bude NodePort
+Overte spustenie služby buď pomocou prehliadača alebo príkazov curl a http. Po overení
+po sebe všetko zmažte
+
+SOLUTION: 
+kubectl create deployment nginx --image nginxdemos/hello --replicas 5
+kubectl expose deployment nginx --name nginx-hello --type NodePort --port 8080 --target-port 80
+kubectl delete service nginx-hello
+kubectl delete deployment nginx
+
+###############################################
+
+--- Lab: Morning Exercise --- 
+Spustite službu typu LoadBalancer z obrazu bletvaska/rambo so značkou 1. Službu
+spustite na porte 8000, pričom v kontajneri rambo pocuva na porte 80. Sluzbu spustite v 4
+replikach. Služba samotná nech sa volá rambo-lb.
+
+SOLUTION: 
+kubectl create deployment rambo --image bletvaska/rambo:1 --replicas 4
+kubectl expose deployment rambo --name rambo-lb --port 8000 --target-port 80 --type LoadBalancer # dajak nebavi
+### kubectl expose deployment rambo --name rambo-lb --port 8080 --target-port 8000 --type LoadBalancer
+
+##################################################
+
+--- Lab: MariadDB + Adminer by Imperative Commands ---
+Vytvorte kompozíciu služieb Adminer a databázového serveru MariaDB. 
+Vo výsledku budete môcť pristupovať k údajom v MariaDB pomocou webového rozhrania Adminer.
+Pre potreby kompozície vytvore samostatný menný priestor the-project. 
+Všetky objekty, ktoré vytvoríte, spúšťajte v tomto mennom priestore.
+
+Pre spustenie databázového servera MariaDB platia tieto podmienky:
+názov obrazu, z ktorého spravíte službu, je mariadb
+heslo pre používateľa root nastavte na secret
+službu nazvite db a spustite v clustri na porte obrazu
+
+Pre spustenie webového rozhrania Adminer platia tieto podmienky:
+názov obrazu, z ktorého spravíte službu, je adminer
+spustite ho  v troch replikách
+službu nazvite adminer-cl a  spustite ju v klastri na porte 8000
+druhú službu nazvite adminer-np a spustite ju ako NodePort
+tretiu službu nazvite adminer-lb a spustite ju na porte 8080 pomocou Load Balancer-a
+
+Ak ste postupovali správne, pomocou adminera sa budete vedieť dostať na MariuDB.
+
+SOLUTION: 
+kubectl create namespace the-project
+kns the-project
+kubectl create deployment mariadb --image mariadb
+kubectl set env deployment.apps/mariadb MARIADB_ROOT_PASSWORD=secret
+kubectl create deployment adminer --image adminer --replicas 3
+
+kubectl expose deployment adminer --name adminer-cl --type ClusterIP --port 8000 --target-port 8080
+kubectl port-forward --address 0.0.0.0 deployments/adminer 8000:8080
+kubectl expose deployment adminer --name adminer-np --type NodePort --port 8000 --target-port 8080
+kubectl expose deployment adminer --name adminer-lb --type LoadBalancer --port 8080
+
+########################################################
 
