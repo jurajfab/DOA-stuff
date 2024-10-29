@@ -128,3 +128,29 @@ SOLUTION:
 kubectl set image deployments rambo-po rambo=bletvaska/rambo:3
 kubectl set image deployments rambo-ke rambo=bletvaska/rambo:2
 kubectl set image deployments rambo-ba rambo=bletvaska/rambo:4
+
+--- Lab: Rambo with ingress --- 
+Vytvorte Ingress pre celú filmovú sériu Rambo, ktorá bude vyzerať nasledovne:
+● /rambo/1 - rambo 1
+● /rambo/2 - rambo 2
+● /rambo/3 - rambo 3
+● /rambo/4 - rambo 4
+● /rambo/5 - rambo 5
+
+SOLUTION:
+kubectl create deployment rambo1 --image bletvaska/rambo:1 --dry-run=client --output yaml
+kubectl expose deployment rambo1 --port 8000 --dry-run=client --output yaml
+
+kubectl create deployment rambo2 --image bletvaska/rambo:2 --dry-run=client --output yaml
+kubectl expose deployment rambo2 --port 8000 --dry-run=client --output yaml
+
+kubectl create deployment rambo3 --image bletvaska/rambo:3 --dry-run=client --output yaml
+kubectl expose deployment rambo3 --port 8000 --dry-run=client --output yaml
+
+kubectl create deployment rambo4 --image bletvaska/rambo:4 --dry-run=client --output yaml
+kubectl expose deployment rambo4 --port 8000 --dry-run=client --output yaml
+
+kubectl create deployment rambo5 --image bletvaska/rambo:5 --dry-run=client --output yaml
+kubectl expose deployment rambo5 --port 8000 --dry-run=client --output yaml
+
+kubectl create ingress rambo --rule=/rambo/1=rambo1:8000 --rule=/rambo/2=rambo2:8000 --rule=/rambo/3=rambo3:8000 --rule=/rambo/4=rambo4:8000 --rule=/rambo/5=rambo5:8000 --dry-run=client --output yaml
