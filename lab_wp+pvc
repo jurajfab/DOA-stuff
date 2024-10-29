@@ -1,0 +1,166 @@
+--- Lab: Persistent WordPress ---
+● CMS WordPress spustite z obrazu wordpress v troch replikách v režime NodePort
+● ako databázový systém použite MariaDB z obrazu mariadb a heslo pre používateľa
+root nastavte na MasterPassword
+● pre potreby databázového servera vytvorte PV o veľkosti 500M, pričom jeho typ nech
+je hostPath
+● vytvorte PVC, ktoré bude hľadať voľnú kapacitu o veľkosti 200M, a ktoré použijete na
+špecifikáciu volume pre databázový server 
+
+SOLUTION:
+
+pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: 500m
+spec:
+  capacity:
+    storage: 500Mi
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: "/mnt/500m"
+    type: DirectoryOrCreate
+
+manifest.yaml 
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secrets
+data:
+  MARIADB_ROOT_PASSWORD: TWFzdGVyUGFzc3dvcmQ=
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wp-db-pvc
+spec:
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 200Mi
+  accessModes:
+  - ReadWriteOnce
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: wp-db
+    tier: backend
+    env: prod
+    customer: tuke 
+  name: wp-db
+  namespace: wordpress 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wp-db
+      tier: backend
+      env: prod
+      customer: tuke
+  template:
+    metadata:
+      labels:
+        app: wp-db
+        tier: backend
+        env: prod
+        customer: tuke
+    spec:
+      containers:
+      - image: mariadb
+        name: mariadb
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/mysql
+        envFrom:
+        - secretRef:
+            name: db-secrets
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: wp-db-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: wp-db
+    tier: backend
+    env: prod
+    customer: tuke
+  name: wp-db
+  namespace: wordpress
+spec:
+  ports:
+  - name: db
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: wp-db
+  type: ClusterIP
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: wp-app
+    tier: frontend
+    env: prod
+    customer: tuke 
+  name: wp-app
+  namespace: wordpress
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: wp-app
+      tier: frontend
+      env: prod
+      customer: tuke
+  template:
+    metadata:
+      labels:
+        app: wp-app
+        tier: frontend
+        env: prod
+        customer: tuke
+    spec:
+      containers:
+      - image: wordpress
+        name: wordpress
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: wp-app
+    tier: frontend
+    env: prod
+    customer: tuke
+  name: wp-app
+  namespace: wordpress
+spec:
+  ports:
+  - name: www
+    port: 80
+    protocol: TCP
+    targetPort: 80
+    nodePort: 32500
+  selector:
+    app: wp-app
+  type: NodePort
+
