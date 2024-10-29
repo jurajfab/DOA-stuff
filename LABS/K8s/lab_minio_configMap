@@ -90,3 +90,5 @@ spec:
   selector:
     app: minio
   type: LoadBalancer
+
+
