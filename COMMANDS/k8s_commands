@@ -206,11 +206,16 @@ AKO ZAHASHOVAT text
 echo -n "text" | base64
 
 ### INGRESS ### 
+
 kubectl create ingress <ingress_name> --rule /=<service_name>:<port>
 kubectl create ingress weather --rule /=weather:8000
 kubectl create ingress weather --rule /*=weather:8000
 kubectl create ingress weather --rule /*=weather:8000 --namespace the-project
+
+# Host based rule 
 kubectl create ingress weather --rule www.weather.sk/*=weather:8000 --namespace the-project 
+
+ 
 
 
 
