@@ -154,3 +154,65 @@ kubectl create deployment rambo5 --image bletvaska/rambo:5 --dry-run=client --ou
 kubectl expose deployment rambo5 --port 8000 --dry-run=client --output yaml
 
 kubectl create ingress rambo --rule=/rambo/1=rambo1:8000 --rule=/rambo/2=rambo2:8000 --rule=/rambo/3=rambo3:8000 --rule=/rambo/4=rambo4:8000 --rule=/rambo/5=rambo5:8000 --dry-run=client --output yaml
+
+Ak mam pristup ku etc/host suboru viem tam dat IP adresu mojho stroja a k tomu priradit URL
+18.185.138.186      1.rambo.sk 2.rambo.sk 3.rambo.sk 4.rambo.sk 5.rambo.sk
+
+ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rambo-controller
+  namespace: rambo
+spec:
+  rules:
+  - host: 1.rambo.sk
+    http:
+      paths:
+      - backend:
+          service:
+            name: rambo1
+            port:
+              number: 8000
+        path: /
+        pathType: Prefix
+  - host: 2.rambo.sk
+    http:
+      paths:
+      - backend:
+          service:
+            name: rambo2
+            port:
+              number: 8000
+        path: /
+        pathType: Prefix
+  - host: 3.rambo.sk
+    http:
+      paths:
+      - backend:
+          service:
+            name: rambo3
+            port:
+              number: 8000
+        path: /
+        pathType: Prefix
+  - host: 4.rambo.sk
+    http:
+      paths:
+      - backend:
+          service:
+            name: rambo4
+            port:
+              number: 8000
+        path: /
+        pathType: Prefix
+  - host: 5.rambo.sk
+    http:
+      paths:
+      - backend:
+          service:
+            name: rambo5
+            port:
+              number: 8000
+        path: /
+        pathType: Prefix
