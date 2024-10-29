@@ -248,9 +248,9 @@ containers:
       mountPath: /usr/share/nginx/html
   volumes:
     - name: storage
-    hostPath:
-      path: /tmp/www              # na hostovskom stroji 
-      type: DirectoryOrCreate
+      hostPath:
+        path: /tmp/www              # na hostovskom stroji 
+        type: DirectoryOrCreate
 ---------------------------
 ## PERSISTENT VOLUME ## 
 apiVersion: v1
