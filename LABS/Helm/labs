@@ -1,0 +1,142 @@
+--- Lab: Installing Portainer ---
+Vo svojom K8s prostredí nainštalujte aplikáciu Portainer pomocou balíčkovacieho systému
+Helm. Pre nainštalovaný balík musí platiť:
+● ako Helm repozitár použite https://portainer.github.io/k8s
+● balík nainštalujte do menného priestoru portainer
+● názov vydania pomenujte portainer
+● typ služby nastavte na LoadBalancer
+● hodnotu persistence.size nastavte na 300Mi
+Ak ste postupovali správne, Portainer otvoríte na adrese objektu LoadBalancer na porte
+9000, resp. na adrese http://$HOSTIP:9000. Správnosť inštalácie overte aj pomocou
+príkazu helm a kubectl.
+
+SOLUTION:
+helm repo add portainer https://portainer.github.io/k8s
+helm repo update 
+
+helm install portainer portainer/portainer \
+--create-namespace --namespace portainer \
+--set service.type=LoadBalancer \
+--set persistence.size=300Mi
+
+##########################################################
+
+--- Lab: Rambo: First Blood Chart --- 
+Vytvorte balík s názvom rambo, ktorý bude obsahovať potrebné manifesty pre vytvorenie
+služby s aplikáciou bletvaska/rambo:1
+
+SOLUTION:
+# init chart
+$ helm create rambo
+$ cd rambo
+$ rm -rf templates/* values.yaml charts/
+$ vim readme.md
+# create and apply deployment
+$ kubectl create deployment rambo \
+--image bletvaska/rambo:1 \
+--dry-run=client \
+-o yaml > templates/deployment.yaml
+$ kubectl apply -f templates/deployment.yaml
+# create and apply service
+$ kubectl expose deploy/rambo \
+--port 80 \
+--dry-run=client \
+-o yaml > templates/service.yaml
+$ kubectl apply -f templates/service.yaml
+# test template
+$ helm template .
+# test with linter
+$ helm lint .
+# install chart
+$ helm install rambo .
+# test created manifest
+$ helm get manifest rambo
+# create helm package
+$ cd ..
+$ helm package rambo
+
+################################################################
+
+--- Lab: WordPress --- 
+
+Nainštalujte balík Wordpress od Bitnami. Zabezpečte tieto vlastnosti:
+
+heslo pre používateľa root pre DBS nastavte na secret (ale nie je nutné)
+do WordPress-u sa budete vedieť prihlásiť ako používateľ jano s heslom kolobezka
+zabezpečte perzistenciu na úrovni WordPress-u, ako aj databázy
+veľkosť zväzku v prípade WordPress-u nastavte na 100MB
+veľkosť zväzku v prípade databázy nastavte na 200MB
+balík nainštalujte do menného priestoru wordpress
+vytvorte Ingress pomocou host pravidla, kde výsledná aplikácia bude dostupná na adrese www.wordpress-training.sk
+
+Poznámka: Pre vytvorenie Ingress-u musíte mať prístup k lokálnemu súboru hosts. Ak k nemu prístup nemáte, tak miesto host pravidla spravte pravidlo tak, aby bol WordPress priamo dostupný na adrese vášho stroja.
+
+Zistite, čo všetko sa v rámci balíka nainštalovalo.
+
+SOLUTION:
+values.yaml 
+mariadb:
+  auth:
+    rootPassword: secret 
+  primary:
+    persistence:
+      enabled: true
+      size: "200Mi"
+
+wordpressUsernname: jano
+wordpressPassword: kolobezka
+
+persistence:
+  enabled: true
+  size: "100Mi" 
+
+service:
+  type: ClusterIP
+  ports:
+    http: 8000
+  targetPort:
+    http: 80
+
+ingress:
+  enabled: true
+  hostname: www.wordpress-training.sk
+  path: /
+  pathType: Prefix
+
+$ helm install wordpress bitnami/wordpress --create-namespace --namespace wordpress --values values.yaml
+
+#########################################################################
+
+--- Lab #1: Nginx with Rambo ---
+Nainštalujte balík bitnami/nginx, ale s týmito zmenami:
+názov vydania nech je firstblood
+miesto obrazu bitnami/nginx použite obraz bletvaska/rambo
+nainštalujte verziu obrazu s filmom First Blood (aka Rambo 1)
+port kontajnera nastavte na 80
+nech sa aplikácia spustí v dvoch replikách
+služba typu ClusterIP nech je spustená na porte 9000
+službu spustite aj ako externú (NodePort) na porte 32000
+balík nainštalujte do menného priestoru rambo
+
+Riešenie môžete vytvoriť dvoma spôsobmi:
+buď vo forme príkazu s potrebnými prepínačmi, alebo
+pomocou samostatného súboru s nastaveniami values.yaml
+
+Správnosť riešenia môžete overiť pomocou príkazu kubectl port-forward na úrovni pod-u (kvôli inému portu), 
+ale aj na úrovni služby (kvôli samotnému výstupu).
+
+SOLUTION: 
+values.yaml
+replicaCount: 2
+namespace: rambo 
+
+service:
+  type: NodePort
+  ports: 
+    http: 9000
+  nodePorts:
+    http: 32000
+  targetPort:
+    http: 80 
+
+$ helm install firstblood bitnami/nginx --values values-rambo.yaml 
