@@ -13,32 +13,32 @@ spec:
             port:
               number: 8000
         path: /rambo/1
-        pathType: Prefix # Prefix
+        pathType: Exact # Prefix
       - backend:
           service:
             name: rambo-2-svc
             port:
               number: 8000
         path: /rambo/2
-        pathType: Prefix # Prefix
+        pathType: Exact # Prefix
       - backend:
           service:
             name: rambo-3-svc
             port:
               number: 8000
         path: /rambo/3
-        pathType: Prefix # Prefix
+        pathType: Exact # Prefix
       - backend:
           service:
             name: rambo-4-svc
             port:
               number: 8000
         path: /rambo/4
-        pathType: Prefix # Prefix
+        pathType: Exact # Prefix
       - backend:
           service:
             name: rambo-5-svc
             port:
               number: 8000
         path: /rambo/5
-        pathType: Prefix # Prefix
+        pathType: Exact # Prefix
