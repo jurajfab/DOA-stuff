@@ -21,3 +21,6 @@ watch -n 1 --differences docker container ls --all          # kazdu sekundu sled
 
 AKO ZAHASHOVAT text: echo -n "text" | base64
 AKO ODHASHOVAT text: echo -n "text" | base64 -d 
+
+
+test -f "./binary/demo"         # otestuje ci zadany file existuje
