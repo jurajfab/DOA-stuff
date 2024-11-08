@@ -1,4 +1,4 @@
-# Foobar
+# THIS IS README.md EXAMPLE
 
 Foobar is a Python library for dealing with word pluralization.
 
