@@ -74,9 +74,9 @@ Vyplnis par veci a das vytvorit
 
 
 Registracia Runnera na serveri: 
-gitlab-runner register --url https://gitlab.com --token glrt-t3_h8tPzzV_nNcxjYAkyysz
+gitlab-runner register --url https://gitlab.com --token <token>
 
-root@ip-172-31-27-171:/home/ubuntu# gitlab-runner register --url https://gitlab.com --token glrt-t3_h8tPzzV_nNcxjYAkyysz
+root@ip-172-31-27-171:/home/ubuntu# gitlab-runner register --url https://gitlab.com --token <token>
 Runtime platform                                    arch=amd64 os=linux pid=383722 revision=12030cf4 version=17.5.3
 Running in system-mode.                            
                                                    
@@ -441,17 +441,17 @@ download:
 ############################################################################
 --- Lab12: API token test --- 
 Vytvor token pre nejaky projekt 
-glpat-wzu-un8CZ762xf-jEpTf
+<vygenerovany_token>
 
 Na VM pustim prikaz 
 zobrazenie pipeline:
-curl --header "PRIVATE-TOKEN:glpat-wzu-un8CZ762xf-jEpTf" "https://gitlab.com/api/v4/projects/64248593/pipelines"
+curl --header "PRIVATE-TOKEN:<vygenerovany_token>" "https://gitlab.com/api/v4/projects/64248593/pipelines"
 zobrazenie konkretnej pipeline, pridam jej ID: 
-curl --header "PRIVATE-TOKEN:glpat-wzu-un8CZ762xf-jEpTf" "https://gitlab.com/api/v4/projects/64248593/pipelines/1530969396" | jq
+curl --header "PRIVATE-TOKEN:<vygenerovany_token>" "https://gitlab.com/api/v4/projects/64248593/pipelines/1530969396" | jq
 
 Test of Personal TOKEN:
-glpat-z6nRHDmorPrzhe7Q1koc
+<vygenerovany_token>
 zobrazenie vsetkych projektov: 
-curl --header "PRIVATE-TOKEN:glpat-z6nRHDmorPrzhe7Q1koc" "https://gitlab.com/api/v4/projects/64291359" | jq
+curl --header "PRIVATE-TOKEN:<vygenerovany_token>" "https://gitlab.com/api/v4/projects/64291359" | jq
 
 ##################################################################
