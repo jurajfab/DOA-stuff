@@ -88,6 +88,11 @@ docker run registry.gitlab.com/jjfabry/test-container-registry
 https://gitlab.com/api/v4/projects/64210314/ref/main/trigger/pipeline?token=glptt-8090932eadbf18438fce15a9098a7b0d33203378
 
 ### Package register ### 
+Command example: 
+- 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file <source_to_the_file> "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/<package_name>/<version>/<file>"'
+
+- 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file src/java-app/target/hello-world-1.war "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/java_package/1.0.0/HelloWorld.class"'
+
 java-registry-test
 ACCESS TOKEN: glpat-pEzSF48RL662yARwXJwb
 Project ID: 64291359
@@ -100,4 +105,3 @@ Download z Gitlab package register na VM:
 curl --header "PRIVATE-TOKEN: glpat-pEzSF48RL662yARwXJwb" "https://gitlab.com/api/v4/projects/64291359/packages/generic/users-groups/0.0.1/file.txt"
 
 
-- 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file src/java-app/target/hello-world-1.war "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/{package_name}/1.0.1/HelloWorld.class"'
