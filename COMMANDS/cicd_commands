@@ -94,14 +94,14 @@ Command example:
 - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file src/java-app/target/hello-world-1.war "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/java_package/1.0.0/HelloWorld.class"'
 
 java-registry-test
-ACCESS TOKEN: glpat-pEzSF48RL662yARwXJwb
+ACCESS TOKEN: token
 Project ID: 64291359
 
 
 Upload z VM do Gitlab package register: 
-curl --header "PRIVATE-TOKEN: glpat-pEzSF48RL662yARwXJwb" --upload-file /etc/passwd "https://gitlab.com/api/v4/projects/64291359/packages/generic/users-groups/0.0.1/file.txt?status=default"
+curl --header "PRIVATE-TOKEN: token" --upload-file /etc/passwd "https://gitlab.com/api/v4/projects/64291359/packages/generic/users-groups/0.0.1/file.txt?status=default"
 
 Download z Gitlab package register na VM:
-curl --header "PRIVATE-TOKEN: glpat-pEzSF48RL662yARwXJwb" "https://gitlab.com/api/v4/projects/64291359/packages/generic/users-groups/0.0.1/file.txt"
+curl --header "PRIVATE-TOKEN: token" "https://gitlab.com/api/v4/projects/64291359/packages/generic/users-groups/0.0.1/file.txt"
 
 
