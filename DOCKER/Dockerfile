@@ -54,7 +54,7 @@ HEALTHCHECK \
 
 # specifikuje default prikaz        
 CMD [ "python", "-m", "weather" ]
-
+CMD [ "usr/sbin/httpd", "-D", "FOREGROUND" ]
 ###########################################################
 # aky image 
 FROM nginx:alpine 
@@ -84,6 +84,7 @@ ENV VERSION=$VERSION
 # commandy ktore sa spustia pri buildovani 
 RUN sed -i 's/{{ AUTHOR }}/'"${AUTHOR}"'/g' index.html 
 RUN sed -i 's/{{ VERSION }}/'"${VERSION}"'/g' index.html 
-
+# zmena listen portu na apachi
+RUN sed -i 's/Listen 80/Listen 8080/g' /etc/apache2/httpd.conf
 ##########################################################
 
