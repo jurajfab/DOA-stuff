@@ -1,0 +1,57 @@
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+
+stages:
+  - build
+  - sign
+  - verify
+  - test
+
+default:
+  image: dockerhub.devops.telekom.de/docker:dind
+  tags:
+    - otc_run_sysbox_s
+  before_script:
+    - mkdir -p ~/.docker
+    - mv $DOCKER_AUTH_CONFIG ~/.docker/config.json
+ 
+
+services:
+  - name: 'dockerhub.devops.telekom.de/docker:20.10.12-dind'
+    command: ['--tls=false', '--host=tcp://0.0.0.0:2375', '--registry-mirror=https://dockerhub.devops.telekom.de']
+    alias: docker
+
+build_docker:
+  stage: build
+  script:
+    - docker image build -t mtr.devops.telekom.de/juraj_fabry/mtr-test:$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA .
+    - docker image push mtr.devops.telekom.de/juraj_fabry/mtr-test:$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA
+
+
+sign_job:
+  stage: sign
+  script:
+    - apk add cosign
+    - echo "$COSIGN_PRIVATE_KEY" | cosign sign --tlog-upload=false --key /dev/stdin mtr.devops.telekom.de/juraj_fabry/mtr-test:$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA
+
+verify_sign:
+  stage: verify
+  script:
+    - apk add cosign
+    - echo "$COSIGN_PUBLIC_KEY" | cosign verify --insecure-ignore-tlog --key /dev/stdin mtr.devops.telekom.de/juraj_fabry/mtr-test:$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA
+
+
+test_job:
+  stage: test
+  services:
+      - name: mtr.devops.telekom.de/juraj_fabry/mtr-test:$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA
+        alias: python_app
+        entrypoint:
+          - python
+          - src/main.py
+  script:
+    - apk add curl
+    - unset http_proxy https_proxy
+    - curl http://python_app:8080
