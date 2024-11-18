@@ -1,0 +1,65 @@
+---
+- name: Common playbook
+  hosts: 
+    - vm_ubuntu
+  
+  tasks: 
+    - name: Install all packages
+      become: yes
+      ansible.builtin.apt:
+        - htop
+        - vim
+        - kazam
+        - filezilla
+        - bluefish
+      state: present
+      update_cache: yes 
+   
+    # - name: Install htop
+    #   ansible.builtin.apt:
+    #     name: htop
+    #     state: present 
+    #     update_cache: yes
+    #     become: yes
+    #   tags: installation
+
+    # - name: Install vim
+    #   ansible.builtin.apt:
+    #     name: vim
+    #     state: present 
+    #     update_cache: yes
+    #     become: yes
+    #   tags: installation
+    
+    # - name: Install kazam
+    #   ansible.builtin.apt:
+    #     name: kazam
+    #     state: present 
+    #     update_cache: yes
+    #     become: yes
+    #   tags: installation
+
+    # - name: Install filezilla
+    #   ansible.builtin.apt:
+    #     name: filezilla
+    #     state: present 
+    #     update_cache: yes
+    #     become: yes
+    #   tags: installation
+
+    # - name: Install bluefish
+    #   ansible.builtin.apt:
+    #     name: bluefish 
+    #     state: present 
+    #     update_cache: yes
+    #     become: yes
+    #   tags: installation
+
+  #  - name: Install PHP
+  
+
+    - name: Download Image
+      ansible.build.get_url:
+        url: https://cdn.wallpapersafari.com/55/73/ghY4rc.jpg
+        dest: /home/ubuntu
+      tags: download
