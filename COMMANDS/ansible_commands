@@ -68,59 +68,11 @@ inventory=/tmp/hosts            # nastavi odkial ma brat defaultne hosty
 ansible vm_ubuntu -m apt -a "name=vim" -b           # nainstaluje balicek vim, -b znamena ze to spravi so sudom
 ansible vm_ubuntu -m shell -a "date"                # spusti prikaz date na machine
 ansible all -m setup                                # vypise info o vsetkych hostoch z inventory fileu
+ansible vm_debian -m copy -a "path=/home/ubuntu/test.txt dest=/tmp"      # copy file src -> dest
 
 
 Viem to aj bez modulu:
 ansible vm_debian -a "date"
-
-LAB:
-1.DEBIAN!!! Reboot your controlled node using executing and discuss different behaviour:
-    a. /sbin/reboot without any ansible module
-        ansible vm_debian -a "/sbin/reboot" -b
-
-    b. /sbin/reboot using module:
-        i. command (pouziva sa na vykonanie jedneho commandu, nefunguju premmenne)
-            ansible vm_debian -m command -a "/sbin/reboot" -b
-
-        ii. shell (mozem pouzit premenne, pipe, cykly a vsetko co bash obsahuje)
-            ansible vm_debian -m shell -a "/sbin/reboot" -b
-
-    c. Using reboot module
-        ansible vm_debian -m reboot -b  # pocka kym VM znova nabehne a az tak da vypis
-
-2. Print current hostname of controlled device (using ansible)
-    ansible vm_debian -m command -a "hostname"
-    ansible vm_debian -m setup -a "filter=ansible_hostname"
-
-3. Change the host name to yourname (use name and surname instead of `yourname`)
-    ansible vm_debian -m command -a "hostnamectl set-hostname jurajfabry" -b
-    ansible vm_debian -m hostname -a "name=jurajfabry" -b
-
-4. Revert changed name to the original one (from point 2)
-    ansible vm_debian -m hostname -a "name=ip-172-31-37-128" -b
-    ansible vm_debian -m command -a "hostnamectl set-hostname ip-172-31-37-128" -b
-
-5. Copy a file to the /tmp directory of the controlled node
-    ansible vm_debian -m copy -a "src=/home/ubuntu/test.txt dest=/tmp"
-    ansible vm_debian -m copy -a "path=/home/ubuntu/test.txt dest=/tmp"
-
-6. Create a new dir test in /tmp directory
-    ansible vm_debian -m file -a "dest=/tmp/test state=directory mode=0755"
-
-7. Move file (point 5) from /tmp dir to new dir /tmp/test 
-    ansible vm_debian -m command -a "mv /tmp/test.txt /tmp/test"
-    ansible vm_debian -m copy -a "src=/tmp/test.txt dest=/tmp/test remote_src=yes"
-
-8. Delete file from /tmp/test and delete also whole directory /tmp/test
-    ansible vm_debian -m file -a "dest=/tmp/test state=absent" 
-
-9. Install package cmatrix (apt, package)
-    ansible vm_debian -m package -a "name=cmatrix state=present update_cache=yes" -b
-    ansible vm_debian -m apt -a "name=cmatrix state=present update_cache=yes" -b
-
-If you want get all information about a node, you can do this using: 
-ansible all -m setup
-
 
 PLAYBOOK
 ansible-playbook playbook.yml                       # spusti playbook

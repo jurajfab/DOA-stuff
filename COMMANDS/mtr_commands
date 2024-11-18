@@ -1,0 +1,32 @@
+HOW TO PUSH IMAGE TO MTR:
+1. create robot 
+2. create repository
+3. login to docker 
+    docker login -u='mtr-trainings+duri_robot' -p=<token> mtr.devops.telekom.de
+4. re-tag 
+    docker image tag webapp-jfabry:jfabry mtr.devops.telekom.de/juraj_fabry/mtr-test:webapp
+5. push 
+    docker push mtr.devops.telekom.de/juraj_fabry/mtr-test:webapp
+
+IMAGE TAG EXPIRATION: 
+1. v dockerfile 
+    LABEL quay.expires-after='1w'    
+2. v docker build commande 
+    docker build -t $REGISTRYIMAGE -label quay.expires-after='TIME PERIOD'
+3. v GUI
+
+CREATION OF PUBLIC INTERNAL REPO:
+1.	Create Public repo with internal_ prefix 
+2.	Add repo to robot 
+3.	Login on VM 
+    docker login -u='juraj_fabry+robot4' -p='F6PMGWXXOQJ8CUN3G314FDEZXQ6VQETDQJ8LEJPNUDWL6E1ODMWT9NYJ6PAL10YD' mtr.devops.telekom.de
+4.	Re-tag 
+    docker image tag webapp-jfabry:jfabry mtr.devops.telekom.de/juraj_fabry/internal_test_repo:jfabry
+5.	Docker image push 
+    docker image push mtr.devops.telekom.de/juraj_fabry/internal_test_repo:jfabry
+6.	Test:
+a.	Docker logout
+b.	Delete image on VM 
+c.	Docker pull 
+docker pull mtr.devops.telekom.de/juraj_fabry/internal_test_repo
+
