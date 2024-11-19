@@ -1,0 +1,6 @@
+template_cpu.j2
+CPU of machine {{ ansible_hostname }}: {{ ansible_processor[2] }}
+
+template_servers.j2
+This is file for host: {{ item.name }}
+RAM size: {{ item.RAM }}
