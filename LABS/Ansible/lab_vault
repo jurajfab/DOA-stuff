@@ -1,0 +1,116 @@
+LAB: VAULT
+1. Nastavit heslo pre sudo usera (ubuntu) + zrusit cez visudo /etc/sudoers.d/…. NOPASSWD
+2. Vytvorit subor s tajnymi premennymi (ansible-vault create secrets.yml || ansible-vault encrypt secrets.yml)
+3. namapovat premennu so sudo heslom na oficialnu premennu ansible_become_pass (ansible_become_pass=’{{ ubuntu_become_pass }}’)
+4. vytvorit subor s vault heslom (plaintext) - .vault_pass
+5. pridat do ansible.cfg aby sa vault heslo automaticky loadovalo (vault_password_file=.vault_pass)
+6. loadnut subor s tajnymi premennymi do playbooku
+        vars_files:
+	        - secrets.yml
+
+SOLUTION:
+#create vault 
+ansible-vault create secrets.yml
+ubuntu_sudo_passwd: heslo 
+
+#file hosts
+vm_ubuntu  ansible_connection=local   ansible_user=ubuntu    ansible_become_pass='{{ ubuntu_sudo_passwd }}'
+
+#file .ansible.cfg 
+[defaults]
+inventory=/tmp/hosts
+vault_password_file=.vault_pass
+
+#file .vault_pass
+heslo
+
+#playbook
+---
+- name: Common playbook
+  hosts: 
+    - vm_ubuntu
+  
+  vars: 
+    servers:
+      - name: galaxy
+        RAM: 8
+      - name: vulcan
+        RAM: 16
+      - name: ameros
+        RAM: 4
+    bg_url: https://cdn.wallpapersafari.com/55/73/ghY4rc.jpg
+    bg_dir: Pictures
+  
+  vars_files:
+    - secrets.yml
+
+  tasks:
+    - name: Install PHP prerequisities
+      become: yes 
+      ansible.builtin.apt:
+        name: 
+          - ca-certificates
+          - apt-transport-https
+          - software-properties-common
+        state: present
+        update_cache: yes 
+      tags: packages
+
+    - name: Add repository
+      become: yes
+      ansible.builtin.apt_repository:
+        repo: ppa:ondrej/php
+        state: present
+      #  codename: trusty       # needed on Debian
+        update_cache: yes
+      tags: packages
+
+    - name: Install packages
+      become: yes
+      ansible.builtin.apt:
+        name:
+          - htop
+          - vim
+          - kazam
+          - filezilla
+          - bluefish
+        state: present
+        update_cache: yes
+      tags: packages 
+    
+    - name: Install PHP
+      become: yes 
+      ansible.builtin.apt:
+        name:
+          - php8.4
+      tags: packages 
+
+    - name: Create pictures directory
+      ansible.builtin.file: 
+        path: "{{ ansible_user_dir }}/{{ bg_dir }}"
+        state: directory
+        mode: 0755
+      tags: background
+
+    - name: Download image
+      ansible.builtin.get_url:
+        url: "{{ bg_url }}"
+        dest: "{{ ansible_user_dir }}/{{bg_dir}}/bg.jpg"
+      tags: background
+
+    - name: Create cpu.txt
+      ansible.builtin.template:
+        src: /home/ubuntu/template_cpu.j2
+        dest: /home/ubuntu/cpu.txt
+        owner: ubuntu
+        mode: '0644'
+      tags: template
+
+    - name: Create servers.txt
+      ansible.builtin.template:
+        src: /home/ubuntu/template_servers.j2
+        dest: "/tmp/{{ item.name }}.txt"
+      loop: "{{ servers }}"
+      tags: template
+
+---------------------------------
