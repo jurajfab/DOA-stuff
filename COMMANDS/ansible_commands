@@ -79,3 +79,52 @@ ansible-playbook playbook.yml                       # spusti playbook
 ansible-playbook playbook.yml --tags "shell"        # spusti playbook ale len tie so zadanym tagom
 ansible-playbook playbook.yml --skip-tags "shell"   # spusti playbook ale skipne zadane tagy
 
+# HOW TO CREATE VAR AND PRINT IT AFTER END #
+
+    - name: Check PHP version
+      ansible.builtin.shell: php --version
+      register: php_version_out
+      tags: debug
+
+    - name: Display
+      ansible.builtin.debug: 
+        var: php_version_out.stdout_lines[0]
+      tags: debug
+
+
+# ANSIBLE VAULT #
+ansible-vault create <filename>
+ansible-vault create passwd.yml     # vytvoris si subor s heslami pre ansible 
+ansible-vault edit passwd.yml       # edituje subor s heslami 
+ansible-vault decrypt passwd.yml    # decryptuje subor s heslami 
+    ubuntu@ip-172-31-42-181:~$ cat passwd.yml 
+    ubuntu_sudo_passwd: heslo
+    api_token: 46484sdf8549dfa984984df9ad8
+ansible-vault encrypt passwd.yml
+
+Viem najprv vytovit subor s heslami a potom zacryptovat 
+
+// vytvorenie sifrovaneho suboru
+ansible-vault create passwds.yml
+
+// editacia
+ansible-vault edit passwds.yml
+
+// sifrovanie
+ansible-vault encrypt passwds.yml
+
+// desifrovanie
+ansible-vault decrypt passwds.yml
+
+// spustenie playbooku s vyziadanim BECOME hesla
+ansible-playbook playbook.yml -e @passwds.yml --ask-become-pass
+- ak mam vytvoreny vault a zadane heslo na vault v ansible.cfg spustam playbook a heslo na sudo, ak nemam v hosts zadefinovane ansible_become_pass
+
+// spustenie playbooku s vyziadanim hesla na odsifrovanie @passwds.yml runtime
+ansible-playbook playbook.yml -e @passwds.yml --ask-vault-pass
+- ak mam vytvoreny vault tak tymto prikazom spustim playbook ale vyziada ma na zaciatku heslo na vault
+
+# ROLES #
+# CREATING NEW ROLES # 
+ansible-galaxy init <role_name>
+ansible-galaxy init --force oracle 
