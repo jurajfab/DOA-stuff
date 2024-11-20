@@ -1,0 +1,92 @@
+Tasks:
+1. Create following roles:
+    a. common - common packages prepared in “Creating your first playbook“ section
+    b. dev - special development tools
+    c. office - administrative employees stuff
+2. Create 3 different playbooks for the following device groups:
+    a. administrative (roles common + office)
+    b. development (roles common, dev)
+    c. management (roles common, dev, office)
+3. Prepare your inventory file to be able add computers to particular groups
+4. For development group install common packages and:
+    a. docker - don’t forget to ensure the your user belongs to the docker group
+    https://docs.docker.com/engine/install/ubuntu/ 
+    b. git
+5. For administrative group install common packages and:
+    a. Libre Office
+    b. pidgin
+6. For management install all from development and administrative
+7. Set different backgrounds for different departments. Try to save images into ~/Pictures directory and save it for every group with its own filename (e.g. <group>.jpg). You can use variables… Backgrounds:
+    a. development
+    https://cdn.wallpapersafari.com/55/73/ghY4rc.jpg
+    b. management
+    https://thumbs.dreamstime.com/z/colorful-graphs-charts-marketing-research-business-annual-report-background-management-project-budget-planning-financial-68703388.jpg 
+    c. administrative
+    https://thumbs.dreamstime.com/z/isolated-headshot-african-american-business-woman-ceo-finance-law-attorney-legal-representative-white-background-167982948.jpg
+
+SOLUTION: 
+1. vytvor common role 
+    - v tasks uprav main.yml, nahod tam vsetky tasky ktore treba robit 
+2. vytvor office role  
+    - tu daj vsetky tasky z common a pridaj tie co treba robit pre office, popridavaj premmene do vars alebo default dir
+3. vytvor administrative playbook 
+
+---
+- name: Installation for office
+  hosts: 
+    - vm_ubuntu
+  gather_facts: yes 
+
+  vars:
+    bg_name: office
+    bg_url: https://thumbs.dreamstime.com/z/isolated-headshot-african-american-business-woman-ceo-finance-law-attorney-legal-representative-white-background-167982948.jpg
+  
+  vars_files:
+    - secrets.yml
+  
+  roles: 
+    - common 
+    - office 
+
+4. vytvor dev role 
+    - v tasks uprav main.yml, nahod tam vsetky tasky ktore treba robit, popridavaj premmene do vars alebo default dir
+5. vytvor development playbook 
+
+---
+- name: Instalation for development
+  hosts: 
+    - vm_ubuntu
+  gather_facts: yes 
+
+  vars:
+    bg_name: dev
+    bg_url: https://cdn.wallpapersafari.com/55/73/ghY4rc.jpg
+    docker_user: 
+      - root
+      - ubuntu 
+      
+  vars_files:
+    - secrets.yml
+  
+  roles: 
+    - common 
+    - dev
+
+6. vytvor management playbook 
+
+---
+- name: Installation for office
+  hosts: 
+    - vm_ubuntu
+  gather_facts: yes 
+
+  vars:
+    bg_name: office
+    bg_url: https://thumbs.dreamstime.com/z/isolated-headshot-african-american-business-woman-ceo-finance-law-attorney-legal-representative-white-background-167982948.jpg
+  
+  vars_files:
+    - secrets.yml
+  
+  roles: 
+    - common 
+    - office 

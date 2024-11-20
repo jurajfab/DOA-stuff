@@ -1,0 +1,82 @@
+---
+# tasks file for dev
+- name: Install Git and Docker prerequisites 
+  become: yes 
+  ansible.builtin.apt:
+    name: 
+      - git
+      - ca-certificates
+      - curl
+    state: present
+    update_cache: yes 
+    cache_valid_time: 600   # ak bola update cache tak si to drzi 10 min
+  tags: dev
+
+- name: Create keyrings dir
+  become: yes 
+  ansible.builtin.file:
+    name: "{{ keyrings_dir }}"
+    state: directory
+    mode: 0755
+  tags: dev
+
+- name: Add GPG key for Docker repo
+  become: yes 
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    keyring: "{{ keyrings_dir }}/docker.asc"
+    state: present 
+
+- name: Set correct rights on docker.asc
+  become: yes 
+  ansible.builtin.file:
+    path: "{{ keyrings_dir }}/docker.asc"
+    mode: a+r
+  tags: dev
+
+# - name: Get OS arch
+#   ansible.builtin.shell: dpkg --print-architecture
+#   register: arch_out
+#   tags: test 
+
+# - name: Print arch_out
+#   ansible.builtin.debug: 
+#     var: arch_out.stdout
+#   tags: test
+
+- name: Setup Docker repo
+  become: yes 
+  ansible.builtin.apt_repository:
+    repo: "deb [arch={{ arch_out.stdout }} signed-by={{ keyrings_dir }}/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable" 
+    filename: /etc/apt/sources.list.d/docker
+    state: present
+
+- name: Install Docker packages
+  become: yes 
+  ansible.builtin.apt:
+    name: 
+      - docker-ce 
+      - docker-ce-cli 
+      - containerd.io 
+      - docker-buildx-plugin 
+      - docker-compose-plugin
+    state: present 
+    update_cache: yes 
+  notify: start docker service
+  tags: dev 
+
+- name: Ensure group docker exists
+  become: yes 
+  ansible.builtin.apt:
+    name: docker
+    state: present 
+  tags: dev
+
+- name: Add users to docker
+  become: yes 
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: yes
+  loop: "{{ docker_user }}"
+  tags: dev 

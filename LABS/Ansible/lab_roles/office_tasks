@@ -1,0 +1,12 @@
+---
+# tasks file for office
+- name: Install Administrative packages
+  become: yes 
+  ansible.builtin.apt:
+    name: 
+      - libreoffice
+      - pidgin
+    state: present
+    update_cache: yes 
+    cache_valid_time: 600   # ak bola update cache tak si to drzi 10 min
+  tags: office
