@@ -2,6 +2,8 @@
 
 Foobar is a Python library for dealing with word pluralization.
 
+## ANSIBLE GITLAB: https://git.kpi.fei.tuke.sk/mm649zg/deutche-telecom-ansible-2024
+
 ## Installation
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
