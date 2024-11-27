@@ -30,3 +30,9 @@ b.	Delete image on VM
 c.	Docker pull 
 docker pull mtr.devops.telekom.de/juraj_fabry/internal_test_repo
 
+VYTVORENIE DOCKER_AUTH_CONFIG kvoli pripojeniu na mtr z gitlabu:
+1. Vytvor DOCKER_AUTH_CONFIG variable ako FILE a daj tam z robota json ktory je v docker configurations
+2. do .gitlab-ci.yml daj do casti before_script:
+    before_script:
+        - mkdir -p ~/.docker
+        - mv $DOCKER_AUTH_CONFIG ~/.docker/config.json
