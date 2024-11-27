@@ -1,0 +1,58 @@
+MOZNE CHYBY: 
+--------------------------------------------------------
+$ mkdir -p ~/.docker
+$ mv $DOCKER_AUTH_CONFIG ~/.docker/config.json
+$ apk add curl
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/community/x86_64/APKINDEX.tar.gz
+(1/1) Installing curl (8.11.0-r2)
+Executing busybox-1.36.1-r29.trigger
+OK: 43 MiB in 74 packages
+$ unset http_proxy https_proxy
+$ curl http://python_application:8080
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0curl: (6) Could not resolve host: python_application
+Cleaning up project directory and file based variables
+00:01
+ERROR: Job failed: exit code 6
+
+SOLUTION: skontroluj cestu k python fileu 
+entrypoint:
+        - python
+        - app/src/main.py  <--- CHYBA
+        - src/main.py 
+
+------------------------------------------------------------
+$ mkdir -p ~/.docker
+$ mv $DOCKER_AUTH_CONFIG ~/.docker/config.json
+mv: can't stat '/root/.docker/config.json/{': Not a directory
+mv: can't stat '/root/.docker/config.json/"auths":': Not a directory
+mv: can't stat '/root/.docker/config.json/{': Not a directory
+mv: can't stat '/root/.docker/config.json/"mtr.devops.telekom.de":': Not a directory
+mv: can't stat '/root/.docker/config.json/{': Not a directory
+mv: can't stat '/root/.docker/config.json/"auth":': Not a directory
+mv: can't stat '/root/.docker/config.json/"anVyYWpfZmFicnkrbG9naW5fcm9ib3Q6NExEQjBHNFZCTDk1SzdJUEpVNFpIMFdMV1VaSkcxWDZDTldQMFJVUzNERzhFVFhVR1FRSkxGVVQ5UjgyVUtWWg==",': Not a directory
+mv: can't stat '/root/.docker/config.json/"email":': Not a directory
+mv: can't stat '/root/.docker/config.json/""': Not a directory
+mv: can't stat '/root/.docker/config.json/}': Not a directory
+mv: can't stat '/root/.docker/config.json/}': Not a directory
+mv: can't stat '/root/.docker/config.json/}': Not a directory
+
+SOLUTION: 
+Upravit DOCKER_AUTH_CONFIG variable na FILE 
+
+------------------------------------------------------------
+$ docker image build --tag mtr.devops.telekom.de/juraj_fabry/mtr-test:webapp_jf .
+ERROR: error during connect: Head "http://docker:2375/_ping": dial tcp: lookup docker on 10.171.184.100:53: no such host
+Cleaning up project directory and file based variables
+00:01
+ERROR: Job failed: exit code 1
+
+SOLUTION: mozny preklep alebo chyba nejake slovo
+services:
+  - name: 'dockerhub.devops.telekom.de/docker:20.10.12-dind'
+    command: ['--tls=false', '--host=tcp://0.0.0.0:2375', '--registry-mirror=https://dockerhub.devops.telekom.de']
+    alias: dockerr   <---- CHYBA 
+    alias: docker 
+-------------------------------------------------------------
