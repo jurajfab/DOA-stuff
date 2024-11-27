@@ -1,16 +1,19 @@
+## USEFULL LINKS
+## ANSIBLE GITLAB: 
+https://git.kpi.fei.tuke.sk/mm649zg/deutche-telecom-ansible-2024
+
+# MTR links:
+## sysbox runners 
+https://docs.devops.telekom.de/documentation/mcicd/userdocumentation-magentacicd/tools/gitlab/shared-sysbox-runners/
+## kubernetes-otc runners 
+https://docs.devops.telekom.de/documentation/mcicd/userdocumentation-magentacicd/tools/gitlab/kubernetes-runners-otc/
+## docker auth to MTR
+https://docs.devops.telekom.de/documentation/mcicd/userdocumentation-magentacicd/tools/mtr/authentication-and-authorization/
+
+
 # THIS IS README.md EXAMPLE
 
 Foobar is a Python library for dealing with word pluralization.
-
-## ANSIBLE GITLAB: https://git.kpi.fei.tuke.sk/mm649zg/deutche-telecom-ansible-2024
-
-# MTR links:
-## https://docs.devops.telekom.de/documentation/mcicd/userdocumentation-magentacicd/tools/gitlab/shared-sysbox-runners/
-## https://docs.devops.telekom.de/documentation/mcicd/userdocumentation-magentacicd/tools/gitlab/kubernetes-runners-otc/
-## https://docs.devops.telekom.de/documentation/mcicd/userdocumentation-magentacicd/tools/mtr/authentication-and-authorization/
-
-
-
 
 ## Installation
 
