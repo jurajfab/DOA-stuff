@@ -1,0 +1,79 @@
+stages:
+  - build
+  - sign
+  - test
+  - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  IMAGE_NAME: mtr.devops.telekom.de/patrik_cigas/mtr-test
+  IMAGE_TAG: $CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA
+
+default:
+  image: dockerhub.devops.telekom.de/docker:dind
+  tags:
+    - otc_run_sysbox_s
+  before_script:
+    - mkdir -p $HOME/.docker
+    - cp $DOCKER_AUTH_CONFIG $HOME/.docker/config.json
+
+services:
+  - name: 'dockerhub.devops.telekom.de/docker:dind'
+    command: ['--registry-mirror=https://dockerhub.devops.telekom.de']
+    alias: docker
+
+build-image-sysbox:
+  stage: build
+  script:
+    - docker build 
+      -f Dockerfile
+      --build-arg http_proxy=$http_proxy 
+      --build-arg https_proxy=$http_proxy 
+      --build-arg no_proxy=$no_proxy 
+      --build-arg FLASK_HOST=0.0.0.0
+      --build-arg FLASK_PORT=8080
+      -t $IMAGE_NAME:$IMAGE_TAG .
+    - docker push $IMAGE_NAME:$IMAGE_TAG
+
+build-image-kaniko:
+  image:
+    name: artifactory.devops.telekom.de/gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  stage: build
+  tags:
+    - aws_run_k8s_intel_s
+  script:
+    - /kaniko/executor
+      --registry-mirror dockerhub.devops.telekom.de
+      --context $CI_PROJECT_DIR
+      --dockerfile $CI_PROJECT_DIR/Dockerfile
+      --destination $IMAGE_NAME:$IMAGE_TAG-kaniko
+      --destination $IMAGE_NAME:latest-kaniko
+      --cache=true --cache-repo $CI_REGISTRY_IMAGE
+      --build-arg http_proxy=$http_proxy
+      --build-arg https_proxy=$https_proxy
+      --build-arg no_proxy=$no_proxy
+
+sign-image:
+  stage: sign
+  script:
+    - apk add cosign
+    - cosign sign --tlog-upload=false --key $COSIGN_PRIVATE_KEY $IMAGE_NAME:$IMAGE_TAG
+
+test-application:
+  stage: test
+  image: dockerhub.devops.telekom.de/curlimages/curl:latest
+  services:
+    - name: $IMAGE_NAME:$IMAGE_TAG
+      alias: my-web-app
+  script:
+    - unset http_proxy https_proxy
+    - curl -s http://my-web-app:8080 | grep "Welcome to DevOps Academy"
+
+validate-signature-and-deploy:
+  stage: deploy
+  script:
+    - apk add cosign
+    - cosign verify --insecure-ignore-tlog --key $COSIGN_PUBLIC_KEY $IMAGE_NAME:$IMAGE_TAG
+    - echo "Deploying image somewhere..."   
