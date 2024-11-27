@@ -36,3 +36,25 @@ VYTVORENIE DOCKER_AUTH_CONFIG kvoli pripojeniu na mtr z gitlabu:
     before_script:
         - mkdir -p ~/.docker
         - mv $DOCKER_AUTH_CONFIG ~/.docker/config.json
+
+
+TAGOVANIE:
+Version element description                   |    GitLab CI/CD predefined environment variable name
+----------------------------------------------------------------------------------------------------
+Git tag                                       |   
+Note: only available in “tag-pipelines”,      |    CI_COMMIT_TAG
+that is, pipelines started for commits        |
+that are actually tagged with Git!            |
+-----------------------------------------------------------------------------------------------------
+Git commit SHA-256 hash                       |    CI_COMMIT_SHA
+-----------------------------------------------------------------------------------------------------
+Shortened Git commit hash                     |    CI_COMMIT_SHORT_SHA
+-----------------------------------------------------------------------------------------------------
+Git branch name                               |
+Note: not always available (e.g.              |    CI_COMMIT_BRANCH
+missing for a tag-pipeline)                   |
+-----------------------------------------------------------------------------------------------------
+date + timestamp                              |    CI_JOB_STARTED_AT 
+-----------------------------------------------------------------------------------------------------
+A unique build number                         |    CI_JOB_ID
+
