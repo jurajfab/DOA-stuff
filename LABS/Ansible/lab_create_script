@@ -1,0 +1,26 @@
+---
+- name: Common playbook
+  hosts: 
+    - vm
+  
+  tasks:
+    - name: Copy using inline content
+      ansible.builtin.copy:
+        content: |        # pipa umozni viacriadkovy kommand a zachova formatovanie
+          #!/bin/bash
+          touch emptyfile.txt
+          echo "emptyfile.txt has been created"
+        dest: /home/ubuntu/juraj.fabry/script.sh
+        mode: 0755
+
+    - name: Run a script
+      ansible.builtin.script: /home/ubuntu/juraj.fabry/script.sh
+      register: output
+
+    - name: Debug
+      ansible.builtin.debug:
+        var: output.stdout_lines
+
+
+RUN:
+ansible-playbook playbook.yml >> output.txt
