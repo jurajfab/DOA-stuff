@@ -110,8 +110,6 @@ $ helm install wordpress bitnami/wordpress --create-namespace --namespace wordpr
 --- Lab #1: Nginx with Rambo ---
 Nainštalujte balík bitnami/nginx, ale s týmito zmenami:
 názov vydania nech je firstblood
-miesto obrazu bitnami/nginx použite obraz bletvaska/rambo
-nainštalujte verziu obrazu s filmom First Blood (aka Rambo 1)
 port kontajnera nastavte na 80
 nech sa aplikácia spustí v dvoch replikách
 služba typu ClusterIP nech je spustená na porte 9000
@@ -124,6 +122,8 @@ pomocou samostatného súboru s nastaveniami values.yaml
 
 Správnosť riešenia môžete overiť pomocou príkazu kubectl port-forward na úrovni pod-u (kvôli inému portu), 
 ale aj na úrovni služby (kvôli samotnému výstupu).
+
+k port-forward --address 0.0.0.0 services/<service_name> <port>:<port>
 
 SOLUTION: 
 values.yaml
