@@ -2,6 +2,10 @@
 eval "$(ssh-agent -s)"          # start ssh agent
 ssh-add <path to private key>   # add priavte key to ssh agent that I want to use 
 
+# Prihlasenie na server a exportovanie niecoho do filu na lokal 
+ssh -o StrictHostKeyChecking=No -i ~/.ssh/jfabry ubuntu@10.14.253.25 "cat /etc/os-release" > sshoutput.txt
+
+
 # Generating SSH key 
 ssh-keygen -t rsa -b 4096 -C "comment/email"        # generates ssh key 
 ssh-keygen -o                                       # generates ed key 
