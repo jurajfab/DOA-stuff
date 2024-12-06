@@ -1,0 +1,39 @@
+# Use Alpine as the base image
+FROM alpine:3.16
+
+LABEL org.opencontainers.image.authors="Juraj Fabry"
+
+# Set environment variables
+ENV KUBE_VERSION="1.27.1" \
+    KUBE_BIN_DIR="/usr/local/bin" \
+    PATH=$PATH:/usr/local/bin \
+    TF_VERSION="1.10.1"
+
+# Install dependencies and Docker
+RUN apk update && apk add --no-cache \
+    bash \
+    curl \
+    iproute2 \
+    iptables \
+    docker \
+    && curl -LO "https://dl.k8s.io/release/v${KUBE_VERSION}/bin/linux/amd64/kubeadm" \
+    && curl -LO "https://dl.k8s.io/release/v${KUBE_VERSION}/bin/linux/amd64/kubectl" \
+    && curl -LO "https://dl.k8s.io/release/v${KUBE_VERSION}/bin/linux/amd64/kubelet" \
+    && chmod +x kubeadm kubectl kubelet \
+    && mv kubeadm kubectl kubelet ${KUBE_BIN_DIR}/ \
+    && rm -rf /var/cache/apk/*
+    
+# Enable IP forwarding
+RUN echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+
+# Install terraform 
+RUN wget https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip && \
+    unzip terraform_${TF_VERSION}_linux_amd64.zip
+
+RUN mv terraform /usr/local/bin/ && chmod +x /usr/local/bin/terraform
+
+# Set up working directory
+WORKDIR /root
+
+# Default entry point
+ENTRYPOINT [ "/bin/bash" ]
