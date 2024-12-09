@@ -1,0 +1,55 @@
+---
+- name: Gather facts
+  hosts: 
+    - ubuntu
+    - debian 
+
+  tasks: 
+    - name: Print OS version, hostname, IP address
+      debug: 
+        msg: "Host: {{ ansible_hostname }}, OS version {{ ansible_distribution }}, IP {{ ansible_all_ipv4_addresses }}"
+
+    - name: Create group devops
+      become: yes 
+      group: 
+        name: devops 
+        state: present 
+
+    - name: Create user devops_user
+      become: yes 
+      user: 
+        name: devops_user 
+        group: devops
+
+    - name: Install apache2
+      become: yes 
+      apt: 
+        name: apache2 
+        state: present 
+        update_cache: yes
+      notify: start apache2 service
+
+    - name: Start apache2 
+      become: yes 
+      service: 
+        name: apache2 
+        state: started 
+
+    - name: Copy HTML file 
+      become: yes
+      copy: 
+        src: /home/ubuntu/training/index.html
+        dest: /var/www/html
+
+    - name: Restart apache2 service
+      become: yes
+      service:
+        name: apache2
+        state: restarted 
+        
+  handlers:
+    - name: start apache2 service
+      service:
+        name: apache2
+        state: started 
+        enabled: true
