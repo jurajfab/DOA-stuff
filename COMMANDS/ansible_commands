@@ -14,7 +14,8 @@ export PATH="$PATH:/home/ubuntu/.local/bin"
 # Overenie ci je nainstalovany #
 ansible --version
 
-# INVENTORY FILE #
+# Vytvorenie  INVENTORY FILE = hosts ( vsetky hosty kam sa chcem pripajat, vratane mastra) 
+- cestu k tomuto filu definujem v .ansible.cfg
 <name>         <host>                     <port>                   <user>
 vm_ubuntu  ansible_connection=local    ansible_user=ubuntu
 vm_debian  ansible_host=18.197.129.95  ansible_port=22         ansible_user=admin
@@ -58,11 +59,10 @@ ansible vm_ubuntu -i /tmp/hosts -m ansible.builtin.ping                # urobi p
 ansible webservers -m ping
 
 # ANSIBLE CONFIG FILE # 
-export ANSIBLE_CONFIG=/tmp/ansible.cfg       # nastavi premenneu na nejaku cestu ku config file 
-
 [defaults]
 inventory=/tmp/hosts            # nastavi odkial ma brat defaultne hosty 
 
+export ANSIBLE_CONFIG=/tmp/ansible.cfg       # nastavi premenneu na nejaku cestu ku config file 
 
 # Hranie sa s modulmi #
 ansible vm_ubuntu -m apt -a "name=vim" -b           # nainstaluje balicek vim, -b znamena ze to spravi so sudom
