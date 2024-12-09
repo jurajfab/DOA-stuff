@@ -1,5 +1,5 @@
 ---
-- name: Gather facts
+- name: Install apache2 
   hosts: 
     - ubuntu
     - debian 
