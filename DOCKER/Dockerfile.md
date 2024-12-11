@@ -119,11 +119,9 @@ CMD [ "/usr/sbin/httpd", "-D", "FOREGROUND" ]
 ```
 ##########################################################
 ``` Dockerfile
-FROM dockerhub.devops.telekom.de/alpine:3.12
+FROM nginx
 
 LABEL maintainer="Juraj Fabry"
-
-RUN apk add nginx bash
 
 ADD src/. /usr/share/nginx/html
 
@@ -133,6 +131,5 @@ RUN sed -i 's/listen 80/listen 8080/g' default.conf
 
 EXPOSE 8080
 
-#CMD [ "/bin/bash" ]
 CMD ["nginx", "-g", "daemon off;"]
 ```
