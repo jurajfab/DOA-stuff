@@ -13,6 +13,7 @@ default:
   image: dockerhub.devops.telekom.de/docker:dind
   tags:
     - otc_run_sysbox_s
+  #  - aws_run_k8s_intel_m       # ak chcem pouzit tohto runnera tak nemusim davat tu cast before_scritp 
   before_script:
     - mkdir -p ~/.docker
     - mv $DOCKER_AUTH_CONFIG ~/.docker/config.json
