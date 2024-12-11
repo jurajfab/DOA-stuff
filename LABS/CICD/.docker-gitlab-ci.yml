@@ -1,0 +1,22 @@
+image: docker:latest
+
+services:
+  - name: "dockerhub.devops.telekom.de/docker:20.10.12-dind"
+    command: ["--registry-mirror=https://dockerhub.devops.telekom.de"]
+    alias: docker
+
+before_script:
+  - docker login -u="$MTR_USER" -p="$MTR_PASS" mtr.devops.telekom.de
+
+build_image:
+  tags:
+    - otc_run_sysbox_s
+  stage: build
+  script:
+    - docker build -t mtr.devops.telekom.de/juraj_fabry/training:apache2 .
+    - docker push mtr.devops.telekom.de/juraj_fabry/training:apache2
+  only:
+    - docker
+
+after_script:
+  - docker logout mtr.devops.telekom.de
