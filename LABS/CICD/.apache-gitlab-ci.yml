@@ -1,0 +1,58 @@
+variables:
+  APP_NAME:
+    value: ""
+    description: "Enter app name"
+  EXECUTOR_NAME:
+    value: ""
+    description: "Enter executor name"
+
+stages:
+  - test
+  - release
+
+default:
+  image: dockerhub.devops.telekom.de/docker:dind
+  tags:
+    - otc_run_sysbox_s
+  before_script:
+    - mkdir -p ~/.docker
+    - mv $DOCKER_AUTH_CONFIG ~/.docker/config.json
+
+services:
+  - name: 'dockerhub.devops.telekom.de/docker:20.10.12-dind'
+    command: ['--tls=false', '--host=tcp://0.0.0.0:2375', '--registry-mirror=https://dockerhub.devops.telekom.de']
+    alias: docker
+
+test_job:
+  stage: test
+  services:
+    - name: mtr.devops.telekom.de/juraj_fabry/training:apache2
+      alias: apache2
+      entrypoint:
+        - /usr/sbin/httpd
+        - -D
+        - FOREGROUND
+  script:
+    - apk add curl
+    - unset http_proxy https_proxy
+    - curl http://apache2:8080 -o output.txt
+  artifacts:
+    name: output
+    paths:
+      - output.txt
+  only:
+    - develop
+
+
+release-job:
+    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    stage: release
+    script:
+        - echo "Creating release"
+    only: 
+        - develop
+    when: manual
+    release:
+        name: 'Apache2:$CI_COMMIT_SHORT_SHA'
+        tag_name: '$CI_COMMIT_SHORT_SHA'
+        description: 'Sample Apache2:$CI_COMMIT_SHORT_SHA'
