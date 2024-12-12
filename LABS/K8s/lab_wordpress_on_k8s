@@ -238,7 +238,6 @@ kubectl create configmap wp-config --from-env-file wp_credentials.env --output y
 
 kubectl create secret generic wp-secrets --from-literal=WORDPRESS_DB_PASSWORD=end321 --dry-run=client --output yaml
 
-manifest.yaml  
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -250,6 +249,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: db-config
+  namespace: wordpress
 data:
   MARIADB_DATABASE: wordpress
   MARIADB_USER: wpuser
@@ -257,9 +257,41 @@ data:
 ---
 
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: 500m
+  namespace: wordpress
+spec:
+  capacity:
+    storage: 500Mi
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: "/mnt/500m"
+    type: DirectoryOrCreate
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wp-db-pvc
+  namespace: wordpress
+spec:
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 200Mi
+  accessModes:
+  - ReadWriteOnce
+
+--- 
+
+apiVersion: v1
 kind: Secret
 metadata:
   name: db-secrets
+  namespace: wordpress 
 data:
   MARIADB_PASSWORD: ZW5kMzIx
   MARIADB_ROOT_PASSWORD: dG9wLnNlY3JldA==
@@ -270,6 +302,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: wp-config
+  namespace: wordpress
 data:
   WORDPRESS_DB_HOST: wp-db
   WORDPRESS_DB_NAME: wordpress
@@ -281,6 +314,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: wp-secrets
+  namespace: wordpress
 data:
   WORDPRESS_DB_PASSWORD: ZW5kMzIx
 
@@ -315,11 +349,18 @@ spec:
       containers:
       - image: mariadb
         name: mariadb
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/mysql
         envFrom:
         - configMapRef:
             name: db-config
         - secretRef:
             name: db-secrets
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: wp-db-pvc
 
 ---
 
@@ -439,6 +480,7 @@ metadata:
     env: dev
     tier: frontend
   name: wp-adminer
+  namespace: wordpress
 spec:
   ports:
   - port: 8080
@@ -449,6 +491,5 @@ spec:
     env: dev
     tier: frontend
   type: NodePort
-
 
 
