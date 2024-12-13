@@ -1,0 +1,70 @@
+---
+- name: Common playbook
+  hosts:
+    - vm_debian
+    - vm_ubuntu
+
+  vars:
+    image_url: https://images.pexels.com/photos/3140196/pexels-photo-3140196.jpeg
+    dir_name:
+      - img
+      - css
+    webserver_path: /var/www/html
+
+  tasks:
+  - name: Install apache2 webserver
+    become: yes
+    apt:
+      name: apache2
+      update_cache: yes 
+      state: present 
+    notify:
+      - start apache
+
+  - name: Create CSS and IMG directories
+    become: yes 
+    file: 
+      path: "{{ webserver_path }}/{{ item }}"
+      state: directory
+    loop: "{{ dir_name }}"
+
+  - name: Download picture 
+    become: yes
+    get_url:
+      url: "{{ image_url }}"
+      dest: "{{ webserver_path }}/img/bridge.jpg"
+    
+  - name: Copy index.html
+    become: yes 
+    copy:
+      src: /home/ubuntu/index.html
+      dest: "{{ webserver_path }}/index.html"
+    
+  - name: Copy CSS file
+    become: yes 
+    copy:
+      src: /home/ubuntu/style.css
+      dest: "{{ webserver_path }}/css/style.css"
+
+  - name: Change Apache default port to 8080
+    become: yes
+    lineinfile:
+      path: /etc/apache2/ports.conf
+      regexp: '^Listen '
+      insertafter: '^#Listen '
+      line: Listen 8080
+    notify:
+      - restart apache
+  
+  handlers:
+    - name: start apache
+      become: yes
+      service: 
+        name: apache2
+        state: started
+
+    - name: restart apache
+      become: yes
+      service: 
+        name: apache2
+        state: restarted
