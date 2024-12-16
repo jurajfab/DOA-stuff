@@ -8,6 +8,9 @@ FROM  python:3.11-slim
 LABEL maintainer="Duri"
 LABEL description="Weather  app"
 
+# ak pushujem do MTR tak tymto nastavujem expiraciu imageu
+LABEL quay.expires-after='1w'
+
 # prida lokalne alebo remote subory alebo priecinky
 ADD weather.tgz /
 
