@@ -1,3 +1,4 @@
+```
 Basic config setup before first commit:
 
 $ git config --global user.name "Michal Hucko"
@@ -135,3 +136,4 @@ $ git reset --hard <commit_id>  # REMOVE CHANGES FOR EVER !!!!!! VERY DANGEROUS
 $ git checkout <commit_id>      # CAREFUL its read only state
 $ git switch -                  # move HEAD back to previous position
 $ git switch -c <new-branch>    # create new branch from current commit
+```
