@@ -130,7 +130,7 @@ ADD src/. /usr/share/nginx/html
 
 WORKDIR /etc/nginx/conf.d
 
-RUN sed -i 's/listen 80/listen 8080/g' default.conf
+RUN sed -i 's/listen       80;/listen       8080;/g' default.conf
 
 EXPOSE 8080
 
@@ -179,4 +179,27 @@ ENV https_proxy='http://10.14.38.3:3128'
 
 ENTRYPOINT [ "/usr/sbin/httpd" ]
 CMD [ "-D", "FOREGROUND" ]
+```
+#######################################################
+```Dockerfile
+FROM nginx:latest
+
+ADD https://github.com/startbootstrap/startbootstrap-freelancer/archive/gh-pages.zip /tmp
+
+RUN apt-get update && \
+    apt-get install -y unzip
+
+WORKDIR /tmp
+
+RUN unzip gh-pages.zip \
+    && cp -r startbootstrap-freelancer-gh-pages/. /usr/share/nginx/html \
+    && rm gh-pages.zip
+
+WORKDIR /etc/nginx/conf.d
+RUN sed -i 's/listen       80;/listen       8080;/g' default.conf
+
+WORKDIR /usr/share/nginx/html
+EXPOSE 8080
+
+CMD [ "nginx", "-g", "daemon off;" ]
 ```
