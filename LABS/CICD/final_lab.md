@@ -3,7 +3,7 @@ Cielom ulohy je vytvorenie pipeline, ktora skompiluje Java aplikaciu beziacu pod
 
 1. Vytvorenie projektu
 2. Do projektu pridajte konfiguracny subor pom.xml
-
+```xml
 <?xml version = "1.0" encoding = "UTF-8"?>
 <project xmlns = "http://maven.apache.org/POM/4.0.0"
    xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
@@ -57,9 +57,10 @@ xsi:schemaLocation = "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/
    </build>
    
 </project>
+``` 
 
 3. Pridajte do projektu App.java
-
+```java
 package com.app.example;
 
 import org.springframework.boot.SpringApplication;
@@ -85,31 +86,41 @@ public class App extends SpringBootServletInitializer {
   	return "<center>Hello World Aahhh Mantaapp</center>";
    }
 }
+```
 
 4. Pridajte do projektu Dockerfile
-
+```Dockerfile
 FROM tomcat:9
 ADD src/java-app/target/hello-world-1.war /usr/local/tomcat/webapps/
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
+```
 
 5. Vytvorte pipeline config kde
-    a. Vytvorte job “generate”, ktory vytvori kostru java aplikacie pomocou nastroja maven; stage S1
-        rm -r src || true;  mkdir src
-        cd src; mvn archetype:generate -DgroupId=com.app.example -DartifactId=java-app -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
-
-    Vysledok je adresarova struktura
-    b. Pouzite globalnu cache na prenos adresara src do dalsich jobov.
+a. Vytvorte job “generate”, ktory vytvori kostru java aplikacie pomocou nastroja maven; stage S1
+```        
+rm -r src || true;  mkdir src
+cd src; mvn archetype:generate -DgroupId=com.app.example -DartifactId=java-app -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+```
+Vysledok je adresarova struktura
+b. Pouzite globalnu cache na prenos adresara src do dalsich jobov.
 
 6. V pipeline vytvorte vyslednu aplikaciu pre aplikacny server pomocou maven, v pipeline job “compile”, stage S2
-    cp pom.xml src/java-app
-    cp App.java src/java-app/src/main/java/com/app/example/App.java
-    cd src//java-app/ ; mvn package
+
+```
+cp pom.xml src/java-app
+cp App.java src/java-app/src/main/java/com/app/example/App.java
+cd src//java-app/ ; mvn package
+```
+
 7. Do pipeline pridajte vytvorenie kontajnera z Dockerfile - job docker_image, stage S3
 8. Otestujte spustenie vysledneho docker image na AWS
-    docker login registry.gitlab.com…
-    docker run -d -p  80:8080 CONTAINER_IMAGE_URL
-    firefox aws_ip/hello-world-1/
+```
+docker login registry.gitlab.com…
+docker run -d -p  80:8080 CONTAINER_IMAGE_URL
+firefox aws_ip/hello-world-1/
+```
+
 9. Do pipeline pridajte job “deploy” na automaticke spustenie/nasadenie image na AWS systeme pomocou ssh. Stage S4. Len pripade ak sa jedna o hlavnu vetvu projektu main.
 10. Pridajte do jobu deploy, environments s oznacenim url nasadenia aplikacie.
 11. Vyzdielajte vyslednu aplikaciu hello-world-1.war pomocou pages.
@@ -119,7 +130,7 @@ CMD ["catalina.sh", "run"]
 
 SOLUTION:
 .gitlab-ci.yml
-
+```yaml
 stages:
   - S1
   - S2
@@ -212,6 +223,7 @@ create-release:
             - name: 'hello-world-1.war'
               url: 'https://lab-final-e65276.gitlab.io/hello-world-1.war'
 
+```
 
 Na VM je potrebne vyrobit usera a kluce pre neho, pridat ho do skupiny docker.
 User: java-gitlab Password: heslo 
