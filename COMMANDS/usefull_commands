@@ -5,6 +5,7 @@ ssh-add <path to private key>   # add priavte key to ssh agent that I want to us
 # Prihlasenie na server a exportovanie niecoho do filu na lokal 
 ssh -o StrictHostKeyChecking=No -i ~/.ssh/jfabry ubuntu@10.14.253.25 "cat /etc/os-release" > sshoutput.txt
 
+ssh-copy-id -i ~/.ssh/id_rsa <user>@<ipaddress>       # copy priavte key to target server  
 
 # Generating SSH key 
 ssh-keygen -t rsa -b 4096 -C "comment/email"        # generates ssh key 
