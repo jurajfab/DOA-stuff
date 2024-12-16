@@ -1,3 +1,4 @@
+```yaml
 stages:
   - create
   - build
@@ -95,4 +96,4 @@ create-release:
             links:
             - name: 'hello-world-1.war'
               url: 'https://lab-final-e65276.gitlab.io/hello-world-1.war'
-
+```
