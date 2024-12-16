@@ -136,3 +136,23 @@ EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
 ```
+########################################################
+``` Dockerfile
+FROM alpine:latest
+
+LABEL org.opencontiainers.image.authors="Juraj.Fabry"
+
+RUN apk add apache2 curl 
+
+ADD src/. /var/www/localhost/htdocs
+
+RUN sed -i 's/Listen 80/Listen 8080/g' /etc/apache2/httpd.conf
+
+EXPOSE 8080
+
+ENV http_proxy='http://10.14.38.3:3128'
+ENV https_proxy='http://10.14.38.3:3128'
+
+ENTRYPOINT [ "/usr/sbin/httpd" ]
+CMD [ "-D", "FOREGROUND" ]
+```
