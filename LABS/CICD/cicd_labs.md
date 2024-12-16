@@ -39,6 +39,7 @@ deploy-job:      # This job runs in the deploy stage.
 Commit changes 
 
 Build / Pipelines / New Pipeline / Run pipeline 
+
 ######################################################
 
 ## Lab02: Create new project
@@ -117,6 +118,7 @@ job2:
 ```
 
 #########################################################
+
 ## Lab04: Runner pre skupinu
 Groups / create new group / group04
 Build / Runners / new group runner 
@@ -455,6 +457,7 @@ download:
    - java HelloWorld
 ```
 ############################################################################
+
 ## Lab12: API token test
 Vytvor token pre nejaky projekt 
 <vygenerovany_token>
