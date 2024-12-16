@@ -1,9 +1,9 @@
---- Lab01: vytvorenie .gitlab-ci.yml --- 
-Vytvor novy projekt a vytvor .gitlab-ci.yml 
+## Lab01: vytvorenie .gitlab-ci.yml
+1. Vytvor novy projekt a vytvor .gitlab-ci.yml 
 
 Build / Pipeline editor / Configure pipeline
-
 .gitlab-ci.yml 
+```yml
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
@@ -35,24 +35,23 @@ deploy-job:      # This job runs in the deploy stage.
   script:
     - echo "Deploying application..."
     - echo "Application successfully deployed."
-
+```
 Commit changes 
 
 Build / Pipelines / New Pipeline / Run pipeline 
 ######################################################
 
---- Lab02: Create new project ---
-Create new .gitlab-ci.yml
-use docker busybox
-job named welcome
-script run echo “Ahoj svet”
-Commit .yml
-Check result of CI/CD
-
+## Lab02: Create new project
+1. Create new .gitlab-ci.yml
+2. use docker busybox
+3. job named welcome
+4. script run echo “Ahoj svet”
+5. Commit .yml
+6. Check result of CI/CD
 
 SOLUTION:
 .gitlab-ci.yml
-
+```yml
 image: busybox
 
 stages:          
@@ -62,19 +61,18 @@ welcome:
   stage: build
   script:
     - echo "Hello World!"
-
+```
 commit 
 
 #########################################################
 
---- Lab03: Vytvorenie runnera --- 
+## Lab03: Vytvorenie runnera
 SOLUTION:
 Project / Settings / CICD / Runners / New project runner 
 Vyplnis par veci a das vytvorit 
 
-
 Registracia Runnera na serveri: 
-gitlab-runner register --url https://gitlab.com --token <token>
+``` gitlab-runner register --url https://gitlab.com --token <token> 
 
 root@ip-172-31-27-171:/home/ubuntu# gitlab-runner register --url https://gitlab.com --token <token>
 Runtime platform                                    arch=amd64 os=linux pid=383722 revision=12030cf4 version=17.5.3
@@ -90,22 +88,23 @@ docker
 Enter the default Docker image (for example, ruby:2.7):
 busybox
 Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded!
+```
 
 na gitlabe: view runners 
 
 .gitlab-ci.yml 
+```yml
 image: ubuntu 
-
 job1:
     script: echo "hello world"
     tags:   # staci ak dam jeden tag ktory obsahuje aj moj runner, ak dam viac musim dat vsetky ktore ma runner inac nepojde 
         - doa924
         - telekom
         - devops
-
+```
 Viem zadefinovat aj default tagy pre vsetky joby 
+```yml
 image: ubuntu 
-
 default:
     tags: 
         - doa924
@@ -113,21 +112,20 @@ default:
         - devops 
 job1:
     script: echo "hello world"
-
-
 job2:
     script: echo "hello slovakia"
-
+```
 
 #########################################################
---- Lab04: Runner pre skupinu --- 
+## Lab04: Runner pre skupinu
 Groups / create new group / group04
 Build / Runners / new group runner 
-
+```
 gitlab-runner register --url https://gitlab.com --token glrt-t2_Rgr5HbBnJoTo5bzgu6DD
 lab04
-
+```
 Ak dam enable na projekt 
+```yml
 job1:
     script: echo "test of group runner"
     tags:
@@ -136,15 +134,14 @@ job2:
     script: hostname
     tags:
         - telekom
-
---- Lab05:  --- 
-vytvorim si program.c 
-vytovrim si testovaci script 
-vytvorim si pipelinu 
-
-before_script cast je ze pred kazdym jobom daco spravi
-after_script urobi nieco po jobe 
-
+```
+## Lab05: 
+1. vytvorim si program.c 
+2. vytovrim si testovaci script 
+3. vytvorim si pipelinu 
+- before_script cast je ze pred kazdym jobom daco spravi
+- after_script urobi nieco po jobe 
+```
 #!/bin/bash
 VYS=$(echo -e "2\n3\n"| ./program)
 if test $VYS -eq 5
@@ -153,38 +150,42 @@ then
 else
   exit 1
 fi
-
+```
 ###############################################################
 
---- Lab06: Pipeline podla zadania --- 
+## Lab06: Pipeline podla zadania
 1. Create new project.
 2. Create stages : build, test, deploy.
 3. Before anything run update process of apt (apt update; apt -y upgrade)
 4. Use docker image ubuntu.
 5. During stage build create job compiling with script gcc -o ./binary/demo demo.c
     - create some funny demo.c program in git repo
-
+    
+```
 #include<stdio.h>
 int main() {
 printf("Hello World");
 return 0;
 }
+```
+``` install gcc package “apt update;apt install -y gcc” ```
 
-    - install gcc package “apt update;apt install -y gcc”
 6. During stage test, create job testing_file with script which test existence of file ./binary/demo.
 7. During stage deploy, create job uploading which save results of the build into artifacts.
 8. Create job which cleanup binary folder in case of any error, stage - deploy.
 9. Create job named button performed manually which generate some output “echo” only on the branch main, stage - deploy.
 
 SOLUTION:
+```c
 demo.c 
 #include<stdio.h>
 int main() {
 printf("Hello World");
 return 0;
 }
-
+```
 .gitlab-ci.yml
+```yml
 image: ubuntu
 
 cache:
@@ -234,10 +235,10 @@ button:
   when: manual
   only:
       - main
-
+```
 #######################################################
 
---- Lab07: Clone git project --- 
+## Lab07: Clone git project
 1. clone to your new project repo https://github.com/kriru/firstJava
 2. use image: openjdk
 3. create pipeline to compile and execute HelloWorld.java
@@ -247,6 +248,7 @@ button:
 
 SOLUTION:
 Project / New Project / Import project / Repository by URL
+```yml
 image: openjdk
 
 build-and-run:
@@ -259,11 +261,13 @@ build-and-run:
     artifacts:
         paths:
             - ./HelloWorld.class
+```
 ##############################################################
 
---- Lab08: Prepojenie gitlabu s VM cez SSH ---
+## Lab08: Prepojenie gitlabu s VM cez SSH ---
 SOLUTION: 
-# vytvorenie usera
+### vytvorenie usera
+```
 useradd -m devops               # vytovri usera devops 
 ssh-keygen -o                   # vytvorim par klucov
 Na gitlabe si vytvorim variable SSH_PRIVATE_KEY
@@ -272,14 +276,16 @@ switchnem sa na ROOTa
 v .ssh nakopirujem .pub do authorized_keys
 cp id_ed25519.pub authorized_keys
 otestujem prihlasenie cez kluc: ssh -i id_ed25519 devops@127.0.0.1
-
+```
+```yml
 .gitlab-ci.yml
 image: alpine
 variables:
-AWS_IP: "54.93.216.209"
-USER: devops
-
+    AWS_IP: "54.93.216.209"
+    USER: devops
+```
 Test SSH:
+``` 
 script:
 - apk update ; apk add openssh-client
 - eval $(ssh-agent -s)
@@ -291,16 +297,17 @@ script:
 - ssh $USER@$AWS_IP "date;"
 - echo "54.93.216.209" > data_ip.txt
 - scp data_ip.txt $USER@$AWS_IP:/tmp
-
+```
 #################################################################
 
---- Lab09: Pages --- 
+## Lab09: Pages
 Create a new project 
 Create config .gitlab-ci.yml
   image: fedora:32
   job: pages 
 
 SOLUTION:
+```yml
 image: fedora:32
 
 pages:
@@ -315,10 +322,12 @@ pages:
     artifacts:
         paths:
             - public
+```
 ################################################################
 
---- Lab10: Service mysql --- 
+## Lab10: Service mysql --- 
 SOLUTION:
+```yml
 variables:
     MYSQL_DATABASE: "db_name"
     MYSQL_ROOT_PASSWORD: "dbpass"
@@ -340,28 +349,33 @@ test:
   artifacts:
     paths:
         - customers 
-
+```
 ######################################################################
 
 --- Lab11: Creating dockerfile and registry --- 
-● Create one Dockerfile for calculating 2+3 and print result.
-● Create second Dockerfile config for calculating 3*3 and print result.
-● Create gitlab-ci.yml for building docker images.
+1. Create one Dockerfile for calculating 2+3 and print result.
+2. Create second Dockerfile config for calculating 3*3 and print result.
+3. Create gitlab-ci.yml for building docker images.
     ○ First config will be for main branch
     ○ Second config for other branches
     ○ Create job to push and run master image on GitLab infrastructure.
-● Try newly created images on shared runner
+4. Try newly created images on shared runner
 
 SOLUTION: 
 Dockerfile1
+```Dockerfile
 FROM alpine
 CMD ["sh", "-c", "echo $((2+3))"]
+```
 
 Dockerfile2
+```Dockerfile
 FROM alpine
 CMD ["sh", "-c", "echo $((3*3))"]
+```
 
 .gitlab-ci.yml
+```yml
 stages:
     - build
     - test1
@@ -401,13 +415,15 @@ test2:
     - docker run registry.gitlab.com/jjfabry/lab-calculator:2
   except:
     - main
+```
 #####################################################################################
 
---- Lab: Vytvorenie package registra --- 
+## Lab: Vytvorenie package registra --- 
 SOLUTION: 
 Naimportujem si projekt: https://github.com/kriru/firstJava
 
 .gitlab-ci.yml
+```
 image: curlimages/curl:latest
 
 cache:
@@ -437,21 +453,21 @@ download:
    - microdnf install -y wget
    - 'wget --header="JOB-TOKEN: $CI_JOB_TOKEN" ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/my_package/1.0.1/HelloWorld.class'
    - java HelloWorld
-
+```
 ############################################################################
---- Lab12: API token test --- 
+## Lab12: API token test
 Vytvor token pre nejaky projekt 
 <vygenerovany_token>
 
 Na VM pustim prikaz 
 zobrazenie pipeline:
-curl --header "PRIVATE-TOKEN:<vygenerovany_token>" "https://gitlab.com/api/v4/projects/64248593/pipelines"
+``` curl --header "PRIVATE-TOKEN:<vygenerovany_token>" "https://gitlab.com/api/v4/projects/64248593/pipelines" ```
 zobrazenie konkretnej pipeline, pridam jej ID: 
-curl --header "PRIVATE-TOKEN:<vygenerovany_token>" "https://gitlab.com/api/v4/projects/64248593/pipelines/1530969396" | jq
+``` curl --header "PRIVATE-TOKEN:<vygenerovany_token>" "https://gitlab.com/api/v4/projects/64248593/pipelines/1530969396" | jq ```
 
 Test of Personal TOKEN:
 <vygenerovany_token>
 zobrazenie vsetkych projektov: 
-curl --header "PRIVATE-TOKEN:<vygenerovany_token>" "https://gitlab.com/api/v4/projects/64291359" | jq
+``` curl --header "PRIVATE-TOKEN:<vygenerovany_token>" "https://gitlab.com/api/v4/projects/64291359" | jq ```
 
 ##################################################################
