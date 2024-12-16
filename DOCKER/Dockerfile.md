@@ -156,3 +156,27 @@ ENV https_proxy='http://10.14.38.3:3128'
 ENTRYPOINT [ "/usr/sbin/httpd" ]
 CMD [ "-D", "FOREGROUND" ]
 ```
+#######################################################
+``` Dockerfile
+FROM alpine:latest
+
+LABEL org.opencontiainers.image.authors="Juraj.Fabry"
+
+RUN apk add apache2 curl wget
+
+ADD src/. /var/www/localhost/htdocs
+
+WORKDIR /var/www/localhost/htdocs/img
+RUN wget https://images.squarespace-cdn.com/content/v1/56e8fcc03c44d89db7df9b3e/1554359150041-FS043JZG6F79BEDSZIY2/11+Picture-Perfect+Views+of+the+Golden+Gate+Bridge+in+San+Francisco?format=2500w \
+    && mv * bridge.jpg 
+
+RUN sed -i 's/Listen 80/Listen 8080/g' /etc/apache2/httpd.conf
+
+EXPOSE 8080
+
+ENV http_proxy='http://10.14.38.3:3128'
+ENV https_proxy='http://10.14.38.3:3128'
+
+ENTRYPOINT [ "/usr/sbin/httpd" ]
+CMD [ "-D", "FOREGROUND" ]
+```
