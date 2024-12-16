@@ -31,9 +31,8 @@ docker image ls                                                     # list of ru
 docker container exec -it <container_name> <command>                # v pustenom kontainer pusti nejaky prikaz 
 docker container exec -it relaxed_goodall /bin/bash
 ```
-
-                                ## Description of command ls ## 
 ```
+                                ## Description of command ls ## 
 CONTAINER ID   IMAGE               COMMAND                  CREATED         STATUS         PORTS      NAMES
 242b2ea038e4   bletvaska/weather   "/usr/bin/python3.11…"   9 seconds ago   Up 8 seconds   8000/tcp   infallible_euclid
 ```
