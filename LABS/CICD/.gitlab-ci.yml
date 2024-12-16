@@ -1,0 +1,114 @@
+variables:
+  APP_NAME: 
+    value: ""
+    description: "Enter app name"
+  EXECUTOR_NAME:
+    value: ""
+    description: "Enter executor name"
+
+cache:
+    - paths:
+        - "test_results.txt"
+
+stages:
+  - build
+  - test
+  - deploy
+  - release
+
+building-job: 
+    stage: build
+    script: 
+        - echo "Building sample application"
+
+testing-job:
+    stage: test
+    script: 
+        - echo "Unit test of sample application"
+        - echo $EXECUTOR_NAME > test_results.txt
+
+deploy-job-dev:
+    stage: deploy
+    script:
+        - echo "Deploy application to DEV"
+        - cat test_results.txt
+    only: 
+        - main
+
+deploy-job-prod:
+    stage: deploy
+    script:
+        - echo "Deploy application to PROD"
+        - cat test_results.txt
+    only: 
+        - main
+
+release-job:
+    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    stage: release
+    script:
+        - echo "Release application"
+    only:
+        - main
+    when: manual
+    release:
+        name: 'Release App $CI_COMMIT_SHORT_SHA'
+        tag_name: '$CI_COMMIT_SHORT_SHA'
+        description: 'Sample app $CI_COMMIT_SHORT_SHA'
+variables:
+  APP_NAME: 
+    value: ""
+    description: "Enter app name"
+  EXECUTOR_NAME:
+    value: ""
+    description: "Enter executor name"
+    
+cache:
+    - paths:
+        - "test_results.txt"
+
+stages:
+  - build
+  - test
+  - deploy
+  - release
+
+building-job: 
+    stage: build
+    script: 
+        - echo "Building sample application"
+
+testing-job:
+    stage: test
+    script: 
+        - echo "Unit test of sample application"
+        - echo $EXECUTOR_NAME > test_results.txt
+
+deploy-job-dev:
+    stage: deploy
+    script:
+        - echo "Deploy application to DEV"
+        - cat test_results.txt
+    only: 
+        - main
+
+deploy-job-prod:
+    stage: deploy
+    script:
+        - echo "Deploy application to PROD"
+        - cat test_results.txt
+    only: 
+        - main
+
+release-job:
+    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    stage: release
+    script:
+        - echo "Release application"
+    only:
+        - main
+    when: manual
+    release:
+        name: 'Release App $CI_COMMIT_SHORT_SHA'
+        tag_name: '$CI_COMMIT_SHORT_SHA'
+        description: 'Sample app $CI_COMMIT_SHORT_SHA'
