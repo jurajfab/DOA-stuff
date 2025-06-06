@@ -188,6 +188,8 @@ docker container run --volume home/ubuntu/freelancer:/home/work
 docker container run --rm -it --env-file minio.env --publish 9000:9000 --publish 8000:8000 --volueme $(pwd)/data:/bitnami/minio/data:Z --name minio bitnami/minio 
 docker container run --rm --it --volume .:/app --user $(id --user):$(group --group) alpine        # spusti kontainer s pravami lokalneho pouzivatela 
 
+docker run --rm --name jupyter -p 8888:8888 --mount type=bind,source="$(pwd)",target=/app jupyter-bind-mount:v1
+
 docker container exec ui hostname           # exec spusti prikaz v containeri (shows hostname, same as container ID)
 ```
 ## DOCKER NETWORKS
