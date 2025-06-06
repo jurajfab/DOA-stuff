@@ -177,7 +177,9 @@ EXPOSE 8080
 ENV http_proxy='http://10.14.38.3:3128'
 ENV https_proxy='http://10.14.38.3:3128'
 
+# co je v entrypointe sa spusta vzdy
 ENTRYPOINT [ "/usr/sbin/httpd" ]
+# co je v CMD viem upravit
 CMD [ "-D", "FOREGROUND" ]
 ```
 #######################################################
